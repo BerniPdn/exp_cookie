@@ -16,7 +16,7 @@ function inicializarGrabador(stream) {
         return;
     }
 
-    // Achicando el tamaño del video
+    // Calidad Video
     const opciones = { 
         mimeType: 'video/webm;codecs=vp8,opus',
         videoBitsPerSecond: 5000000

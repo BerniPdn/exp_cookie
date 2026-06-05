@@ -8,8 +8,8 @@
     <script src="https://unpkg.com/@jspsych/plugin-html-button-response@2.0.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-fullscreen@2.0.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.0.0"></script>
-    <link href="https://unpkg.com/jspsych@8.2.3/css/jspsych.css" rel="stylesheet">
-    <script src="runtimcqe.js"></script>
+    <link href= "https://unpkg.com/jspsych@8.2.3/css/jspsych.css" rel="stylesheet">
+    <script src="runtime.js"></script>
     <script src="recorder.js"></script>
 </head>
 
@@ -312,7 +312,7 @@
                     console.log(" Oasis guardado con éxito en el servidor.")
                     
                     } catch (error) {
-                        console.error("❌ Error al guardar Oasis, pero avanzamos igual:", error);
+                        console.error("Error al guardar Oasis, pero avanzamos igual:", error);
                     }
                 }
             };
@@ -481,9 +481,9 @@
         //Configuracion de las plantillas de instrucciones
         //
         const instrucciones_1 = crearInstrucciones(
-            'Instrucciones Parte 1.a',
+            'Instrucciones',
             [
-                'Esta parte consiste en describir 3 imagenes.',
+                'Para este experimento te vamos a mostrar 3 imagenes distintas.',
                 'Para cada una te pedimos que describas todo lo que está pasando en 1 minuto como si se la estuvieses describiendo a alguien que no puede verla.',
                 'Cuando termines, presioná <b>Enviar</b> para guardar tus resultados y pasar a la siguiente imagen.',
                 'Si te excedés del tiempo, el experimento pasará directamente a la siguiente imagen.'
@@ -491,7 +491,7 @@
         );
 
         const parte1_medio = crearInstrucciones(
-            'Instrucciones Parte 1',
+            'Instrucciones',
             [
                 'Tomate el tiempo que necesites antes de avanzar a la siguiente imagen',
                 'Cuando estes listo, presiona siguiente y como con la imagen anterior tenes 1 minuto para describir todo lo que está pasando, como si se la explicaras a alguien que no puede verla.'
@@ -500,19 +500,30 @@
         );
 
         //
-        // Bloque 1 Imagenes
+        // Bloque 1 Imagenes Cookie
         //
-        const lamina_cookie_original = crearTrialImagen('lamina_original.jpeg', 'lamina_cookie_original', 60);
-        const lamina_cookie_nueva = crearTrialImagen('lamina_nueva.png', 'lamina_cookie_nueva', 60)
-        const lamina_bombero_2 = crearTrialImagen ('lamina_bombero.png', 'lamina_bombero', 60)
+        const lamina_nueva_original = crearTrialImagen('cookie_nueva_original.png', 'lamina_nueva_original', 60);
+        const lamina_nueva_invertida = crearTrialImagen('cookie_nueva_invertida.png', 'lamina_nueva_invertida', 60)
+        const lamina_vieja_original = crearTrialImagen('cookie_vieja_original.png', 'lamina_vieja_original', 60);
+        const lamina_vieja_invertida = crearTrialImagen('cookie_vieja_invertida.png', 'lamina_vieja_invertida', 60)
         
         // Aleatorización de las dos variantes de CookieJar (Original vs Nueva)
-        const bloque_laminas_aleatorio = jsPsych.randomization.shuffle([lamina_cookie_original, lamina_cookie_nueva]);
+        const bloque_laminas_nuevas_aleatorio = jsPsych.randomization.shuffle([lamina_nueva_original, lamina_nueva_invertida]);
+        const bloque_laminas_viejas_aleatorio = jsPsych.randomization.shuffle([lamina_vieja_original, lamina_vieja_invertida]);
+        const bloque_laminas_cookie_aleatorio = jsPsych.randomization.shuffle([bloque_laminas_nuevas_aleatorio[0], bloque_laminas_viejas_aleatorio[0]]);
+
         
         //
-        //Bloque 2: Bombero - Estado de Animo
+        //Bloque 2: Oasis + Estado de Animo
         //
-        const lamina_bombero = crearTrialImagen('lamina_bombero.png', 'lamina_bombero', 60);
+        const lamina_oasis_1 = crearTrialImagen('oasis_1.png', 'oasis_1', 60);
+        const lamina_oasis_2 = crearTrialImagen('oasis_2.png', 'oasis_2', 60);
+        const lamina_oasis_3 = crearTrialImagen('oasis_3.png', 'oasis_3', 60);
+        const lamina_oasis_4 = crearTrialImagen('oasis_4.png', 'oasis_4', 60);
+        const lamina_oasis_5 = crearTrialImagen('oasis_5.png', 'oasis_5', 60);
+        
+        // Aleatorización de las imagenes de Oasis
+        const bloque_laminas_oasis_aleatorio = jsPsych.randomization.shuffle([lamina_oasis_1, lamina_oasis_2, lamina_oasis_3, lamina_oasis_4, lamina_oasis_5]);
         const evaluacion_sam_unificada = crearTrialEvaluacionEmocional('post_bombero_oasis_strict');
 
         // Pagina final de cierre y guardado
@@ -543,21 +554,15 @@
             bienvenida,
             pantalla,
             calibracion,
+            //calibracion ojos
             instrucciones_1,
-            bloque_laminas_aleatorio[0],
-            parte1_medio, // capaz aca ver tema calibracion de nuevo
-            lamina_bombero_2,
-            parte1_medio, //capaz aca ver tema calibracion de nuevo
-            bloque_laminas_aleatorio[1],
-            // instrucciones_2, // **
-            // autobiografica_1,
-            // autobiografica_2,
-            // autobiografica_3,
-            // pregunta_edad,
-            // nodo_adultez_media,
-            // autobiografica_5, // ** seria parte del otro experimento
-            // instrucciones_3,
-            // lamina_bombero,
+            bloque_laminas_cookie_aleatorio[0],
+            parte1_medio, 
+            lamina_oasis,
+            parte1_medio,
+            calibracion,
+            //calibracion ojos
+            bloque_laminas_cookie_aleatorio[1],
             evaluacion_sam_unificada,
             pantalla_final
         ]);
