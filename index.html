@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Experimento CookieJar</title>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/jspsych@8.2.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@2.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-fullscreen@2.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.0.0"></script>
+    <link href="https://unpkg.com/jspsych@8.2.3/css/jspsych.css" rel="stylesheet">
+    <script src="runtimcqe.js"></script>
+    <script src="recorder.js"></script>
+</head>
+
+<body>
+    <style>
+        /* Estilo general de la página */
+        body {
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Contenedores generales */
+        .wrapper-experimento {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .wrapper-experimento.wide {
+            max-width: 850px;
+        }
+
+        /* Tarjeta Blanca */
+        .card-experimento {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            padding: 45px 40px;
+            text-align: center;
+        }
+
+        /* Botónees */
+        .jspsych-btn, #btn-enviar-custom {
+            background-color: #2563eb !important;
+            color: #ffffff !important;
+            border: none !important;
+            padding: 12px 35px !important;
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            transition: background-color 0.2s, transform 0.1s !important;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2) !important;
+        }
+        .jspsych-btn:hover, #btn-enviar-custom:hover {
+            background-color: #1d4ed8 !important;
+        }
+        .jspsych-btn:active, #btn-enviar-custom:active {
+            transform: scale(0.98);
+        }
+        .jspsych-btn:disabled, #btn-enviar-custom:disabled {
+            background-color: #64748b !important;
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+        }
+
+        /* Animación REC Micrófono */
+        @keyframes parpadear {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .rec-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #dc2626;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: parpadear 1.5s infinite;
+            vertical-align: middle;
+        }
+
+        /* --- ESTILOS DE EVALUACIÓN EMOCIONAL (OASIS) --- */
+        .o-con { font-family: 'Segoe UI', -apple-system, sans-serif; max-width: 850px; margin: 0 auto; text-align: center; padding: 10px; }
+        .o-title { color: #1e293b; margin-bottom: 35px; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
+        .o-card { background: #ffffff; padding: 30px 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; margin-bottom: 40px; text-align: center; }
+        .o-h3 { color: #0f172a; margin: 0 0 8px 0; font-size: 1.4rem; font-weight: 700; }
+        .o-p { color: #64748b; margin: 0 0 25px 0; font-size: 1.05rem; font-weight: 500; }
+        .o-grid { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+        .o-emoji { font-size: 1.8rem; display: block; margin-bottom: 8px; }
+        .o-radio { margin-bottom: 12px; transform: scale(1.3); cursor: pointer; }
+        .o-txt { font-size: 0.75rem; color: #1e293b; display: block; line-height: 1.2; }
+        
+        /* Selección inteligente mediante CSS puro */
+        .o-label { flex: 1; text-align: center; cursor: pointer; padding: 12px 4px; border-radius: 12px; transition: all 0.2s; border: 1px solid transparent; }
+        .o-label:hover { background: #f1f5f9; }
+        .o-label:has(input:checked) { background: #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-color: #cbd5e1; }
+    </style>
+
+    <script>
+        const jsPsych = initJsPsych();
+
+        //Seguro anti-cierre de pestaña
+        window.addEventListener('beforeunload', function (e) {
+            if (jsPsych.getProgress().current_trial_global < 16) e.preventDefault();
+        });
+        
+        if (!run_id) {
+            console.warn("ALERTA: No se detectó ningún 'run-id' en la URL. Las llamadas a la API van a fallar.");
+            
+            // Aviso si no se abre en Data Pruebas (poco probable)
+            document.body.innerHTML = `
+                <div style="text-align: center; margin-top: 100px; font-family: sans-serif; padding: 20px;">
+                    <h2 style="color: #cc0000;">Error de inicialización</h2>
+                    <p style="font-size: 1.1rem; color: #333;">El experimento no se inició a través de la plataforma Datapruebas (en este caso mi servidor).</p>
+                    <p style="color: #666;">Por favor, vuelve a ingresar desde el panel de paciente de la plataforma.</p>
+                </div>
+            `;
+            throw new Error("Ejecución detenida: Falta run-id en la URL.");
+
+        }
+       
+        //
+        // Helpers
+        //
+
+        /**
+         * Crea un trial de jsPsych que muestra una imagen de estímulo.
+         * Controla que la grabación y el timer inicien SOLO cuando la imagen está visible.
+         */
+         function crearTrialImagen(src, nombreArchivo = null, tiempo) {
+            return {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: /*html*/ `
+                    <div class="wrapper-experimento">
+                        <div class="card-experimento">
+                            <div style="margin-bottom: 25px;">
+                                <span id="timer-display" style="font-size: 1.1rem; font-weight: 700; background: #f1f5f9; padding: 10px 20px; border-radius: 9999px; color: #334155; border: 1px solid #cbd5e1; display: inline-block; visibility: hidden;">
+                                    Tiempo restante: ${tiempo}s
+                                </span>
+                            </div>
+                            
+                            <h2 style="margin: 0 0 10px 0; font-size: 1.9rem; font-weight: 800; color: #1e293b;">Descripción de Escena Visual</h2>
+                            <p style="color: #64748b; margin-bottom: 25px; font-weight: 500;">Por favor, describí detalladamente todo lo que observes en la imagen. Hace de cuenta que se la estas describiendo a alguien que no puede verla.</p>
+
+                            <div style="position: relative; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; display: flex; justify-content: center; align-items: center; min-height: 200px; margin-bottom: 30px;">
+                                <img id="estimulo-imagen" src="${src}" style="max-width: 100%; height: auto; max-height: 450px; border-radius: 8px; opacity: 0; transition: opacity 0.3s ease;">
+                                <div id="loader-imagen-local" style="position: absolute; color: #64748b; font-weight: 600;">⏳ Cargando estímulo visual...</div>
+                            </div>
+
+                            <div>
+                                 <button type="button" id="btn-enviar-custom" disabled>Enviar descripción</button>
+                            </div>
+                        </div>
+                    </div>`,
+                choices: [],
+                on_load: () => { 
+                    const img = document.getElementById('estimulo-imagen');
+                    const loader = document.getElementById('loader-imagen-local');
+                    const timerDisplay = document.getElementById('timer-display');
+                    const btnEnviar = document.getElementById('btn-enviar-custom');
+
+                    function dispararTrial() {
+                        console.log(`[Estímulo Imagen] Presentando: ${nombreArchivo}. Iniciando grabación...`);
+                        
+                        if (loader) loader.remove();
+                        img.style.opacity = '1';
+                        
+                        if (timerDisplay) timerDisplay.style.visibility = 'visible';
+                        if (btnEnviar) {
+                            btnEnviar.disabled = false;
+                            btnEnviar.style.opacity = '1';
+                            btnEnviar.style.cursor = 'pointer';
+                        }
+
+                        comenzarGrabacion();
+                        iniciarTimerVisual(tiempo, nombreArchivo);
+                    }
+
+                    if (img.complete && img.naturalWidth !== 0) {
+                        dispararTrial();
+                    } else {
+                        img.onload = function() {
+                            dispararTrial();
+                        };
+                    }
+
+                    btnEnviar.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        this.disabled = true;
+                        this.textContent = "Enviando...";
+                        frenarYEnviarServidor(nombreArchivo);
+                    });
+                },
+            }
+        }
+
+        /**
+         * Crea un trial de jsPsych para la tarea de memoria autobiográfica situada.
+         * Inicia la grabación, maneja el temporizador visual y guarda metadatos específicos del período.
+         * @param {string} nombreArchivo - Nombre base con el que se guardará el video en el servidor.
+         * @param {string} periodo - El período de tiempo solicitado (ej: 'la niñez', 'el último año').
+         * @param {number} tiempo - Tiempo máximo en segundos que dura el relato antes de terminarse.
+         * @returns {Object} Devuelve el objeto de configuración del trial para el timeline de jsPsych.
+         */
+         function crearTrialMemoria(nombreArchivo, periodo, tiempoPensar = 12, tiempoHablar = 60) {
+    
+            // PANTALLA 1: Tiempo para pensar
+            const pantalla_pensar = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: /*html*/ `
+                    <div class="wrapper-experimento">
+                        <div class="card-experimento">
+                            <span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 700; color: #64748b; display: block; margin-bottom: 10px;">Etapa de Preparación</span>
+                            <h2 style="margin: 0 0 25px 0; font-size: 1.8rem; font-weight: 800; color: #1e293b;">Memoria autobiográfica de: <span style="color: #2563eb;">${periodo}</span></h2>
+                            
+                            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 25px 30px; border-radius: 12px; margin-bottom: 35px; text-align: left;">
+                                <p style="margin: 0 0 15px 0; font-weight: 700; color: #1e293b; text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Para tu relato, tené en cuenta que:</p>
+                                <ul style="margin: 0; padding-left: 20px; color: #475569; line-height: 1.7;">
+                                    <li style="margin-bottom: 8px;">Debe ser un hecho <b>único y puntual</b> (en un día y lugar específicos).</li>
+                                    <li style="margin-bottom: 8px;">No debe ser una rutina o algo que se repetía en el tiempo.</li>
+                                    <li>Intentá incluir detalles de lo que viste, escuchaste, sentiste o pensaste.</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 18px 20px; border-radius: 12px; max-width: 550px; margin: 0 auto;">
+                                <p style="margin: 0; color: #1e40af; font-weight: 600;">Usa este tiempo para organizar tu idea. La grabación comenzará automáticamente.</p>
+                            </div>
+                        </div>
+                    </div>`,
+                choices: [],
+                trial_duration: tiempoPensar * 1000,
+                on_load: () => {
+                    if (typeof intervaloTimer !== 'undefined' && intervaloTimer) clearInterval(intervaloTimer);
+                }
+            };
+
+            // PANTALLA 2: Tiempo para hablar (Versión Estilizada e Integrada)
+            const pantalla_relato = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: /*html*/ `
+                    <div class="wrapper-experimento">
+                        <div class="card-experimento">
+                            <div style="margin-bottom: 20px;">
+                                <span id="timer-display" style="font-size: 1.1rem; font-weight: 700; background: #f1f5f9; padding: 10px 20px; border-radius: 9999px; color: #334155; border: 1px solid #cbd5e1; display: inline-block;">
+                                    Tiempo restante: ${tiempoHablar}s
+                                </span>
+                            </div>
+                            
+                            <h2 style="margin: 0 0 25px 0; font-size: 1.9rem; font-weight: 800; color: #1e293b;">Grabando</h2>
+
+                            <div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 25px 30px; border-radius: 12px; margin-bottom: 35px;">
+                                <p style="margin: 0; font-size: 1.3rem; font-weight: 700; color: #991b1b;"><span class="rec-dot"></span> ¡Micrófono y Camara Activos!</p>
+                                <p style="margin: 10px 0 0 0; color: #7f1d1d; font-weight: 500;">Contanos tu recuerdo situado en:<br><span style="font-weight: 700; color: #dc2626; font-size: 1.25rem;">${periodo}</span></p>
+                            </div>
+                            
+                            <div>
+                                <button type="button" id="btn-enviar-custom">Enviar recuerdo</button>
+                            </div>
+                        </div>
+                    </div>`,
+                choices: [],
+                on_load: () => { 
+                    comenzarGrabacion();
+                    iniciarTimerVisual(tiempoHablar, nombreArchivo);
+                    
+                    const btn = document.getElementById('btn-enviar-custom');
+                    if (btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            this.disabled = true; // El CSS ya lo pone gris y le saca el cursor solo!
+                            this.textContent = "Enviando...";
+                            frenarYEnviarServidor(nombreArchivo);
+                        });
+                    }
+                }
+            }
+            // Retorno del mini-timeline del bloque de memoria
+            return {
+                timeline: [pantalla_pensar, pantalla_relato]
+            };
+        }
+
+        /**
+         * Crea un trial de jsPsych estático para mostrar pantallas de instrucciones o textos informativos.
+         * Con diseño unificado de tarjeta de alta consultoría.
+         * @param {string} titulo - El título principal
+         * @param {string[]} parrafos - Un arreglo de strings, donde cada elemento es un párrafo o instrucción.
+         * @param {string} [boton='Entendido, continuar'] - Texto del botón
+         * @returns {Object} Devuelve el objeto de configuración del trial para el timeline de jsPsych.
+         */
+        function crearInstrucciones(titulo, parrafos, boton = 'Entendido, continuar') {
+            const items = parrafos.map(p => `
+                <li style="position: relative; padding-left: 35px; margin-bottom: 16px; font-size: 1.1rem; color: #475569; line-height: 1.6; text-align: left; list-style: none;">
+                    <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
+                    ${p}
+                </li>
+            `).join('');
+
+            return {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: /*html*/ `
+                    <div class="wrapper-experimento">
+                        <div class="card-experimento">
+                            <span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 700; color: #64748b; display: block; margin-bottom: 10px;">Información Importante</span>
+                            <h2 style="margin: 0 0 30px 0; font-size: 1.9rem; font-weight: 800; color: #1e293b;">${titulo}</h2>
+                            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 30px 25px; border-radius: 12px; margin-bottom: 20px;">
+                                <ul style="margin: 0; padding: 0;">${items}</ul>
+                            </div>
+                        </div>
+                    </div>`,
+                choices: [boton],
+            };
+        }
+
+        /**
+         * Crea un trial unificado de evaluación emocional (Valencia y Arousal) utilizando emojis modernos.
+         * @param {string} [fase='post_bombero_oasis_strict'] - Etiqueta para identificar la fase en la base de datos.
+         * @returns {Object} Configuración del trial para el timeline de jsPsych.
+         */
+        function crearTrialEvaluacionEmocional(fase = 'post_bombero_oasis_strict') {
+            const val_opciones = [
+                ["🤬", "Muy malo /", "negativo"], ["😟", "Bastante", "malo"], ["🙁", "Un poco", "malo"],
+                ["😐", "Neutro", ""], ["🙂", "Un poco", "bueno"], ["😀", "Bastante", "bueno"], ["🚀", "Muy bueno /", "positivo"]
+            ];
+            
+            const aro_opciones = [
+                ["😴", "Muy bajo", "(Calmo)"], ["🥱", "Bastante", "bajo"], ["☕", "Un poco", "bajo"],
+                ["🧘", "Ni bajo", "ni alto"], ["👀", "Un poco", "alto"], ["🔥", "Bastante", "alto"], ["💥", "Muy alto", "(Activado)"]
+            ];
+
+            const genColumnas = (name, opciones) => opciones.map((opt, i) => `
+                <label class="o-label">
+                    <span class="o-emoji">${opt[0]}</span>
+                    <input type="radio" name="${name}" value="${i+1}" class="o-radio"><br>
+                    <span class="o-txt" style="font-weight: ${i===0||i===3||i===6 ? '700':'500'};">
+                        ${opt[1]}${opt[2] ? '<br>'+opt[2] : ''}
+                    </span>
+                </label>`).join('');
+            
+            let valorValencia = null;
+            let valorArousal = null;
+
+            return {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: /*html*/ `
+                    <div class="o-con">
+                        <h2 class="o-title">Evaluación Emocional</h2>
+                        <form id="oasis-form">
+                            <div class="o-card">
+                                <h3 class="o-h3">VALENCIA</h3>
+                                <p class="o-p">¿Cómo describirías tu estado de ánimo en este preciso momento?</p>
+                                <div class="o-grid">${genColumnas('oasis_valence', val_opciones)}</div>
+                            </div>
+                            <div class="o-card" style="margin-bottom: 35px;">
+                                <h3 class="o-h3">ACTIVACIÓN</h3>
+                                <p class="o-p">¿Cómo sentís tu nivel de energía o activación corporal en este preciso momento?</p>
+                                <div class="o-grid">${genColumnas('oasis_arousal', aro_opciones)}</div>
+                            </div>
+                        </form>
+                    </div>`,
+
+                choices: ['Guardar y continuar'], 
+                on_load: function() {
+                    const btnEnviar = document.querySelector('.jspsych-btn');
+                    if (btnEnviar) btnEnviar.disabled = true;
+
+                    // Captura global de cambios en los radios.
+                    document.getElementById('oasis-form').addEventListener('change', () => {
+                        const v_checked = document.querySelector('input[name="oasis_valence"]:checked');
+                        const a_checked = document.querySelector('input[name="oasis_arousal"]:checked');
+
+                        if (v_checked) valorValencia = parseInt(v_checked.value);
+                        if (a_checked) valorArousal = parseInt(a_checked.value);
+
+                        if (btnEnviar) btnEnviar.disabled = !(v_checked && a_checked);
+                    });
+                },
+                on_finish: async function (data) {
+                    data.oasis_valence = valorValencia;
+                    data.oasis_arousal = valorArousal;
+                    data.fase = fase;
+
+                    console.log(" Guardando datos Oasis");
+
+                    try {
+                    await recordData({
+                        trial: fase,
+                        oasis_valence: data.oasis_valence,
+                        oasis_arousal: data.oasis_arousal
+                    });
+                    console.log(" Oasis guardado con éxito en el servidor.")
+                    
+                    } catch (error) {
+                        console.error("❌ Error al guardar Oasis, pero avanzamos igual:", error);
+                    }
+                }
+            };
+        }
+
+        //
+        // Trials estaticos
+        //
+        const bienvenida = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: /*html*/ `
+                <div class="wrapper-experimento">
+                    <div class="card-experimento">
+                        <span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 700; color: #64748b; display: block; margin-bottom: 10px;">Inicio del Estudio</span>
+                        <h2 style="margin: 0 0 15px 0; font-size: 1.9rem; font-weight: 800; color: #1e293b;">¡Te damos la bienvenida al experimento!</h2>
+                        <h3 style="margin: 0 0 30px 0; font-size: 1.2rem; font-weight: 500; color: #475569;">Este experimento consiste de 3 partes. Para evitar distracciones te pedimos que:</h3>
+
+                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 30px 25px; border-radius: 12px; margin-bottom: 20px;">
+                            <ul style="margin: 0; padding: 0;">
+                                <li style="position: relative; padding-left: 35px; margin-bottom: 18px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
+                                    <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
+                                    Cierres otras <b>pestañas</b> y aplicaciones que generen notificaciones.
+                                </li>
+                                <li style="position: relative; padding-left: 35px; margin-bottom: 18px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
+                                    <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
+                                    Pongas el teléfono en modo <b>"No molestar"</b> o silencio.
+                                </li>
+                                <li style="position: relative; padding-left: 35px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
+                                    <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
+                                    Minimices distracciones de tu entorno, intentando estar en un <b>lugar tranquilo</b>.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>`,
+            choices: ['Siguiente'],
+            // Estilo unificado para el botón "Siguiente"
+        };
+
+        const pantalla = {
+            type: jsPsychFullscreen,
+            fullscreen_mode: true,
+            message: '<h3>El experimento ira a pantalla completa cuando presiones el boton que se encuentra abajo</h3>',
+            button_label: 'Ir a pantalla completa'
+        }
+
+        const calibracion = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: /*html*/ `
+                <div class="wrapper-experimento wide">
+                    <div class="card-experimento">
+                        <span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 700; color: #2563eb; display: block; margin-bottom: 10px;">Paso Previo Requerido</span>
+                        <h2 style="margin: 0 0 10px 0; font-size: 1.9rem; font-weight: 800; color: #1e293b;">Verificación de Periféricos</h2>
+                        <p style="color: #64748b; margin-bottom: 35px;">Asegurémonos de que tu micrófono y cámara funcionen correctamente antes de empezar.</p>
+
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 25px; text-align: left; margin-bottom: 35px;">
+                            
+                            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px 25px; border-radius: 12px;">
+                                <h3 style="margin: 0 0 8px 0; font-size: 1.2rem; color: #1e293b;">🎙️ Verificación de micrófono</h3>
+                                <p style="margin-bottom: 15px; font-size: 0.95rem; color: #475569;">Hablá en voz alta y fijate que la barra se mueva. Si no se mueve intenta hablar un poco más fuerte.</p>
+                                <div style="background: #e2e8f0; border-radius: 9999px; height: 16px; overflow: hidden; border: 1px solid #cbd5e1;">
+                                    <div id="barra-audio" style="height: 100%; width: 0%; background: #22c55e; transition: width 0.1s;"></div>
+                                </div>
+                            </div>
+
+                            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px 25px; border-radius: 12px;">
+                                <h3 style="margin: 0 0 8px 0; font-size: 1.2rem; color: #1e293b;">📷 Verificación de cámara</h3>
+                                <p style="margin-bottom: 15px; font-size: 0.95rem; color: #475569;">Asegurate que tu cara esté en el cuadrado verde que aparece en la pantalla de abajo e intenta no moverte mucho durante el experimento.</p>
+                                
+                                <div id="contenedor-camara" style="position: relative; width: 100%; max-width: 500px; height: 310px; margin: 0 auto; background: #0f172a; border-radius: 8px; overflow: hidden; border: 2px solid #cbd5e1;">
+                                    <video id="preview-camara" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover; visibility: hidden;"></video>
+                                    <div id="cuadrado-camara" style="position: absolute; top: 50%; left: 50%; width: 220px; height: 220px; border: 4px solid #22c55e; transform: translate(-50%, -50%); border-radius: 10px; pointer-events: none; display: none;"></div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <p id="estado-mic-cam" style="color: #64748b; font-weight: 600; margin-bottom: 25px;">⏳ Iniciando micrófono y cámara...</p>
+                        
+                        <div>
+                            <button id="btn-calibracion" class="jspsych-btn" disabled>
+                                Calibración de audio y cámara lista
+                            </button>
+                        </div>
+                    </div>
+             </div>`,
+            choices: [],
+
+            on_load: function () {
+                const constraints = {
+                    audio: true,
+                    video: {
+                        width: {min: 1280, ideal: 1280, max: 1920},
+                        height: {min: 720, ideal: 720, max: 1080},
+                        frameRate: {ideal: 30, max: 30}
+                    }
+                };
+
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(function (stream) {
+                        document.getElementById('estado-mic-cam').textContent = 'Micrófono y camara activos.';
+                        document.getElementById('estado-mic-cam').style.color = 'green';
+                        document
+                            .getElementById('btn-calibracion')
+                            .addEventListener('click', function () {
+                                jsPsych.finishTrial();
+                            });
+
+                        const video = document.getElementById('preview-camara');
+                        video.srcObject = stream;
+                        video.onloadedmetadata = function () {
+                            video.style.visibility = 'visible';
+                            document.getElementById('cuadrado-camara').style.display = 'block';
+                        };
+
+                        const audioContext = new AudioContext();
+                        const source = audioContext.createMediaStreamSource(stream);
+                        const analyser = audioContext.createAnalyser();
+                        analyser.fftSize = 256;
+                        source.connect(analyser);
+
+                        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                        // Calibracion del audio
+                        let volumenSuave = 0;
+                        function updateBar() {
+                            const barra = document.getElementById('barra-audio');
+                            if (!barra) return;
+                           
+                            analyser.getByteTimeDomainData(dataArray);
+                        
+                            let sumSquaredDifferences = 0;
+                            for (let i = 0; i < dataArray.length; i++) {
+                                const dev = dataArray[i] - 128;
+                                sumSquaredDifferences += dev * dev;
+                            }
+                            
+                            const meanSquare = sumSquaredDifferences / dataArray.length;
+                            const rms = Math.sqrt(meanSquare);
+
+                            const porcentajeInstantaneo = Math.max(0, Math.min(rms * 2.8, 100));
+                            const factorSuavizado = 0.15;
+                            volumenSuave = (volumenSuave * (1 - factorSuavizado)) + (porcentajeInstantaneo * factorSuavizado);
+
+                            barra.style.width = volumenSuave + '%';
+
+                            //Habilitar boton si el promedio se mueve bien con la voz
+                            if (volumenSuave > 25) {
+                                document.getElementById('btn-calibracion').disabled = false;
+                            }
+
+                            requestAnimationFrame(updateBar);
+                        }
+                        updateBar();
+                        inicializarGrabador(stream);
+                    })
+                    .catch(function () {
+                        document.getElementById('estado-mic-cam').textContent = 
+                            'No se pudo acceder al micrófono y/o la camara. Revisá los permisos.';
+                        document.getElementById('estado-mic-cam').style.color = 'red';
+                    });
+            }
+        }
+        
+        //
+        //Configuracion de las plantillas de instrucciones
+        //
+        const instrucciones_1 = crearInstrucciones(
+            'Instrucciones Parte 1.a',
+            [
+                'Esta parte consiste en describir 3 imagenes.',
+                'Para cada una te pedimos que describas todo lo que está pasando en 1 minuto como si se la estuvieses describiendo a alguien que no puede verla.',
+                'Cuando termines, presioná <b>Enviar</b> para guardar tus resultados y pasar a la siguiente imagen.',
+                'Si te excedés del tiempo, el experimento pasará directamente a la siguiente imagen.'
+            ]
+        );
+
+        const parte1_medio = crearInstrucciones(
+            'Instrucciones Parte 1',
+            [
+                'Tomate el tiempo que necesites antes de avanzar a la siguiente imagen',
+                'Cuando estes listo, presiona siguiente y como con la imagen anterior tenes 1 minuto para describir todo lo que está pasando, como si se la explicaras a alguien que no puede verla.'
+            ],
+            'Siguiente'
+        );
+
+        const instrucciones_2 = crearInstrucciones(
+            'Instrucciones Parte 2',
+            [
+                'Esta parte consiste de varias subpartes. En cada una te pedimos que en 1 minuto nos cuentes una memoria situada en un momento especifico de tu vida',
+                'Antes de cada subparte vas a tener un poco de tiempo para pensar',
+                'Una vez finalizado este tiempo la grabacion comenzara automaticamente',
+                'Si te excedés del tiempo que muestra el contador, el experimento pasará directamente a la siguiente subparte.'
+            ]
+        );
+       
+        const instrucciones_3 = crearInstrucciones(
+            'Instrucciones Parte 3',
+            [
+                'Desarrolla una historia con inicio, desarrollo y desenlace basada en la imagen que vas a ver.',
+                'Cuando termines, presioná <b>Enviar</b> para guardar tus resultados.',
+                'Si te excedés del tiempo, el experimento pasará directamente a la siguiente parte.',
+                'Cuando finalices con la imagen te pedimos que contestes un pequeño formulario.',
+            ]
+        );
+
+        //
+        // Bloque 1 Cookie Jar
+        //
+        const lamina_cookie_original = crearTrialImagen('lamina_original.jpeg', 'lamina_cookie_original', 60);
+        const lamina_cookie_nueva = crearTrialImagen('lamina_nueva.png', 'lamina_cookie_nueva', 60)
+        const lamina_bombero_2 = crearTrialImagen ('lamina_bombero.png', 'lamina_bombero', 60)
+        // Aleatorización de las dos variantes de CookieJar (Original vs Nueva)
+        const bloque_laminas_aleatorio = jsPsych.randomization.shuffle([lamina_cookie_original, lamina_cookie_nueva]);
+        
+        //
+        //Bloque 2: Tareas de memoria autobigrafica
+        //
+        const autobiografica_1 = crearTrialMemoria('autobiografica_1', 'tu <b>infancia</b> (hasta las 12 años)')
+        const autobiografica_2 = crearTrialMemoria('autobiografica_2', 'tu <b>adolescencia</b> (desde los 12 hasta los 20)')
+        const autobiografica_3 = crearTrialMemoria('autobiografica_3', 'tu <b>adultez temprana</b> (desde los 20 hasta los 39)')
+        const autobiografica_4 = crearTrialMemoria('autobiografica_4', 'tu <b>adultez media</b> (desde los 39 hasta los 65)')
+        const autobiografica_5 = crearTrialMemoria('autobiografica_5', 'el <b>año pasado</b>')
+        
+        // Lógica condicional: Filtro para mayores de 40 años (Adultez Media)
+        const pregunta_edad = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: '<h2>Antes de continuar:</h2><p style="font-size: 1.2rem;">¿Tenés 40 años o más?</p>',
+            choices: ['No, tengo menos de 40', 'Sí, tengo 40 o más'],
+            data: { tipo_trial: 'filtro_edad' }
+        };
+
+        const nodo_adultez_media = {
+            timeline: [autobiografica_4],
+            conditional_function: () => {
+                const ensayo_edad = jsPsych.data.get().filter({ tipo_trial: 'filtro_edad' }).values()[0];
+                return ensayo_edad && ensayo_edad.response === 1;
+            }
+        };
+        
+        //
+        //Bloque 3: Bombero - Estado de Animo
+        //
+        const lamina_bombero = crearTrialImagen('lamina_bombero.png', 'lamina_bombero', 60);
+        const evaluacion_sam_unificada = crearTrialEvaluacionEmocional('post_bombero_oasis_strict');
+
+        // Pagina final de cierre y guardado
+        const pantalla_final = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: `
+                <h2>¡Muchas gracias por participar!</h2>
+                <p>Hemos finalizado todas las tareas del experimento puedes cerrar esta pesataña. </p>
+            `,
+            choices: [],
+            on_load: function() {
+                console.log("[Final] Verificando si quedan videos viajando en la fila...");
+                
+                mostrarPantallaCarga();
+
+                esperarQueTermineLaCola().then(() => {
+                    console.log("[Final] ¡La fila de videos se vació por completo! Todo a salvo en el servidor.");
+                    ocultarPantallaCarga(); 
+                    
+                    if (typeof finishExperiment === 'function') {
+                        finishExperiment(); 
+                    }
+                });
+            },
+        };
+
+        jsPsych.run([
+            bienvenida,
+            pantalla,
+            calibracion,
+            instrucciones_1,
+            bloque_laminas_aleatorio[0],
+            parte1_medio, // capaz aca ver tema calibracion de nuevo
+            lamina_bombero_2,
+            parte1_medio, //capaz aca ver tema calibracion de nuevo
+            bloque_laminas_aleatorio[1],
+            // instrucciones_2, // **
+            // autobiografica_1,
+            // autobiografica_2,
+            // autobiografica_3,
+            // pregunta_edad,
+            // nodo_adultez_media,
+            // autobiografica_5, // ** seria parte del otro experimento
+            // instrucciones_3,
+            // lamina_bombero,
+            evaluacion_sam_unificada,
+            pantalla_final
+        ]);
+    </script>
+</body>
+
+</html>
