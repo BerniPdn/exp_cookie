@@ -326,7 +326,7 @@
             stimulus: /*html*/ `
                 <div class="wrapper-experimento">
                     <div class="card-experimento">
-                        <span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 700; color: #64748b; display: block; margin-bottom: 10px;">Inicio del Estudio</span>
+                        <span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 700; color: #64748b; display: block; margin-bottom: 10px;">Inicio del Experimento</span>
                         <h2 style="margin: 0 0 15px 0; font-size: 1.9rem; font-weight: 800; color: #1e293b;">¡Te damos la bienvenida al experimento!</h2>
                         <h3 style="margin: 0 0 30px 0; font-size: 1.2rem; font-weight: 500; color: #475569;">Este experimento consiste de 3 partes. Para evitar distracciones te pedimos que:</h3>
 
@@ -539,8 +539,8 @@
             type: jsPsychHtmlButtonResponse,
             stimulus: `
                 <h2>¡Muchas gracias por participar!</h2>
+                <p>Si te gusto este experimento y queres ayudarnos con tu participacion en otro, te invitamos a hacer el de <b>"Memoria Autobiografica"</b> </p>
                 <p>Hemos finalizado todas las tareas del experimento puedes cerrar esta pesataña. </p>
-                <p>Si te gusto este experimento y queres ayudarnos con tu participacion en otro, te invitamos a hacer el de "Memoria Autobiografica" </p>
             `,
             choices: [],
             on_load: function() {
@@ -568,9 +568,9 @@
             bloque_laminas_cookie_aleatorio[0],
             instrucciones_medio, 
             bloque_laminas_oasis_aleatorio[0],
-            instrucciones_medio,
             calibracion_hardware,
             //calibracion ojos
+            instrucciones_medio,
             bloque_laminas_cookie_aleatorio[1],
             instrucciones_sam,
             evaluacion_sam_unificada,
