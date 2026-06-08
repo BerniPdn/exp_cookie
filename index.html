@@ -528,10 +528,9 @@
         const lamina_oasis_2 = crearTrialImagen('oasis_2.jpg', 'oasis_2', 60);
         const lamina_oasis_3 = crearTrialImagen('oasis_3.jpg', 'oasis_3', 60);
         const lamina_oasis_4 = crearTrialImagen('oasis_4.jpg', 'oasis_4', 60);
-        const lamina_oasis_5 = crearTrialImagen('oasis_5.jpg', 'oasis_5', 60);
         
         // Aleatorización de las imagenes de Oasis
-        const bloque_laminas_oasis_aleatorio = jsPsych.randomization.shuffle([lamina_oasis_1, lamina_oasis_2, lamina_oasis_3, lamina_oasis_4, lamina_oasis_5]);
+        const bloque_laminas_oasis_aleatorio = jsPsych.randomization.shuffle([lamina_oasis_1, lamina_oasis_2, lamina_oasis_3, lamina_oasis_4]);
         const evaluacion_sam_unificada = crearTrialEvaluacionEmocional('post_bombero_oasis_strict');
 
         // Pagina final de cierre y guardado
@@ -560,19 +559,19 @@
         };
 
         jsPsych.run([
-            bienvenida,
-            pantalla,
-            calibracion_hardware,
-            //calibracion ojos
-            instrucciones_1,
-            bloque_laminas_cookie_aleatorio[0],
-            instrucciones_medio, 
-            bloque_laminas_oasis_aleatorio[0],
-            calibracion_hardware,
-            //calibracion ojos
-            instrucciones_medio,
-            bloque_laminas_cookie_aleatorio[1],
-            instrucciones_sam,
+            // bienvenida,
+            // pantalla,
+            // calibracion_hardware,
+            // //calibracion ojos
+            // instrucciones_1,
+            // bloque_laminas_cookie_aleatorio[0],
+            // instrucciones_medio, 
+            // bloque_laminas_oasis_aleatorio[0],
+            // calibracion_hardware,
+            // //calibracion ojos
+            // instrucciones_medio,
+            // bloque_laminas_cookie_aleatorio[1],
+            // instrucciones_sam,
             evaluacion_sam_unificada,
             pantalla_final
         ]);
