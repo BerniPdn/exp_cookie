@@ -232,7 +232,7 @@ function esperarQueTermineLaCola() {
    return colaSubidas;
 }
 
-function apagarCamaraYMicofono() {
+function apagarCamaraYMicrofono() {
     if (streamFisico) {
         streamFisico.getTracks().forEach(track => track.stop());
         console.log("Hardware liberado y apagado.");

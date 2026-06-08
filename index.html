@@ -359,7 +359,7 @@
             button_label: 'Ir a pantalla completa'
         }
 
-        const calibracion = {
+        const calibracion_hardware = {
             type: jsPsychHtmlButtonResponse,
             stimulus: /*html*/ `
                 <div class="wrapper-experimento wide">
@@ -393,7 +393,7 @@
                         <p id="estado-mic-cam" style="color: #64748b; font-weight: 600; margin-bottom: 25px;">⏳ Iniciando micrófono y cámara...</p>
                         
                         <div>
-                            <button id="btn-calibracion" class="jspsych-btn" disabled>
+                            <button id="btn-calibracion-hardware" class="jspsych-btn" disabled>
                                 Calibración de audio y cámara lista
                             </button>
                         </div>
@@ -416,7 +416,7 @@
                         document.getElementById('estado-mic-cam').textContent = 'Micrófono y camara activos.';
                         document.getElementById('estado-mic-cam').style.color = 'green';
                         document
-                            .getElementById('btn-calibracion')
+                            .getElementById('btn-calibracion-hardware')
                             .addEventListener('click', function () {
                                 jsPsych.finishTrial();
                             });
@@ -461,7 +461,7 @@
 
                             //Habilitar boton si el promedio se mueve bien con la voz
                             if (volumenSuave > 25) {
-                                document.getElementById('btn-calibracion').disabled = false;
+                                document.getElementById('btn-calibracion-hardware').disabled = false;
                             }
 
                             requestAnimationFrame(updateBar);
@@ -490,11 +490,19 @@
             ]
         );
 
-        const parte1_medio = crearInstrucciones(
+        const instrucciones_medio = crearInstrucciones(
             'Instrucciones',
             [
                 'Tomate el tiempo que necesites antes de avanzar a la siguiente imagen',
                 'Cuando estes listo, presiona siguiente y como con la imagen anterior tenes 1 minuto para describir todo lo que está pasando, como si se la explicaras a alguien que no puede verla.'
+            ],
+            'Siguiente'
+        );
+
+        const instrucciones_sam = crearInstrucciones(
+            'Instrucciones',
+            [
+                'Por ultimo te pedimos que completes un pequeño formulario sobre tus emociones',
             ],
             'Siguiente'
         );
@@ -516,11 +524,11 @@
         //
         //Bloque 2: Oasis + Estado de Animo
         //
-        const lamina_oasis_1 = crearTrialImagen('oasis_1.png', 'oasis_1', 60);
-        const lamina_oasis_2 = crearTrialImagen('oasis_2.png', 'oasis_2', 60);
-        const lamina_oasis_3 = crearTrialImagen('oasis_3.png', 'oasis_3', 60);
-        const lamina_oasis_4 = crearTrialImagen('oasis_4.png', 'oasis_4', 60);
-        const lamina_oasis_5 = crearTrialImagen('oasis_5.png', 'oasis_5', 60);
+        const lamina_oasis_1 = crearTrialImagen('oasis_1.jpg', 'oasis_1', 60);
+        const lamina_oasis_2 = crearTrialImagen('oasis_2.jpg', 'oasis_2', 60);
+        const lamina_oasis_3 = crearTrialImagen('oasis_3.jpg', 'oasis_3', 60);
+        const lamina_oasis_4 = crearTrialImagen('oasis_4.jpg', 'oasis_4', 60);
+        const lamina_oasis_5 = crearTrialImagen('oasis_5.jpg', 'oasis_5', 60);
         
         // Aleatorización de las imagenes de Oasis
         const bloque_laminas_oasis_aleatorio = jsPsych.randomization.shuffle([lamina_oasis_1, lamina_oasis_2, lamina_oasis_3, lamina_oasis_4, lamina_oasis_5]);
@@ -532,6 +540,7 @@
             stimulus: `
                 <h2>¡Muchas gracias por participar!</h2>
                 <p>Hemos finalizado todas las tareas del experimento puedes cerrar esta pesataña. </p>
+                <p>Si te gusto este experimento y queres ayudarnos con tu participacion en otro, te invitamos a hacer el de "Memoria Autobiografica" </p>
             `,
             choices: [],
             on_load: function() {
@@ -553,16 +562,17 @@
         jsPsych.run([
             bienvenida,
             pantalla,
-            calibracion,
+            calibracion_hardware,
             //calibracion ojos
             instrucciones_1,
             bloque_laminas_cookie_aleatorio[0],
-            parte1_medio, 
-            lamina_oasis,
-            parte1_medio,
-            calibracion,
+            instrucciones_medio, 
+            bloque_laminas_oasis_aleatorio[0],
+            instrucciones_medio,
+            calibracion_hardware,
             //calibracion ojos
             bloque_laminas_cookie_aleatorio[1],
+            instrucciones_sam,
             evaluacion_sam_unificada,
             pantalla_final
         ]);

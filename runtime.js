@@ -75,5 +75,7 @@ function endExperiment(score) {
 /* App */
 async function finishExperiment() {
 	endExperiment(100)
-	apagarCamaraYMicrofono();
+	if (typeof apagarCamaraYMicrofono === 'function') {
+        apagarCamaraYMicrofono();
+    }
 }
