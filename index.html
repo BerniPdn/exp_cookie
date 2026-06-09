@@ -108,7 +108,18 @@
 
         //Seguro anti-cierre de pestaña
         window.addEventListener('beforeunload', function (e) {
-            if (jsPsych.getProgress().current_trial_global < 16) e.preventDefault();
+            try {
+                const progreso = jsPsych.getProgress();
+                // Si el trial actual es menor al total, clavamos el candado
+                if (progreso.current_trial_global < progreso.total_trials) {
+                    e.preventDefault();
+                    e.returnValue = ''; // <-- CRUCIAL: Sin esto, los navegadores modernos ignoran el bloqueo
+                }
+            } catch (err) {
+                // Si jsPsych no llegó a inicializar el progreso todavía, por las dudas bloqueamos el cierre
+                e.preventDefault();
+                e.returnValue = '';
+            }
         });
         
         if (!run_id) {
@@ -334,15 +345,19 @@
                             <ul style="margin: 0; padding: 0;">
                                 <li style="position: relative; padding-left: 35px; margin-bottom: 18px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
                                     <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
-                                    Cierres otras <b>pestañas</b> y aplicaciones que generen notificaciones.
+                                    Cierres otras pestañas y aplicaciones que generen notificaciones.
                                 </li>
                                 <li style="position: relative; padding-left: 35px; margin-bottom: 18px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
                                     <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
-                                    Pongas el teléfono en modo <b>"No molestar"</b> o silencio.
+                                    Pongas el teléfono en modo <b>"No molestar" o silencio</b>.
                                 </li>
                                 <li style="position: relative; padding-left: 35px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
                                     <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
                                     Minimices distracciones de tu entorno, intentando estar en un <b>lugar tranquilo</b>.
+                                </li>
+                                <li style="position: relative; padding-left: 35px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
+                                    <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
+                                    Te asegures de tener <b>buena iluminacion</b>, de manera que <b>tu cara se vea claramente</b> cuando realices la calibracion mas adelante.
                                 </li>
                             </ul>
                         </div>
@@ -380,7 +395,7 @@
 
                             <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px 25px; border-radius: 12px;">
                                 <h3 style="margin: 0 0 8px 0; font-size: 1.2rem; color: #1e293b;">📷 Verificación de cámara</h3>
-                                <p style="margin-bottom: 15px; font-size: 0.95rem; color: #475569;">Asegurate que tu cara esté en el cuadrado verde que aparece en la pantalla de abajo e intenta no moverte mucho durante el experimento.</p>
+                                <p style="margin-bottom: 15px; font-size: 0.95rem; color: #475569;">Asegurate que tu cara esté y en el cuadrado verde que aparece en la pantalla de abajo y que se vea claramente. Intenta no moverte mucho durante el experimento.</p>
                                 
                                 <div id="contenedor-camara" style="position: relative; width: 100%; max-width: 500px; height: 310px; margin: 0 auto; background: #0f172a; border-radius: 8px; overflow: hidden; border: 2px solid #cbd5e1;">
                                     <video id="preview-camara" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover; visibility: hidden;"></video>
@@ -531,6 +546,7 @@
         
         // Aleatorización de las imagenes de Oasis
         const bloque_laminas_oasis_aleatorio = jsPsych.randomization.shuffle([lamina_oasis_1, lamina_oasis_2, lamina_oasis_3, lamina_oasis_4]);
+        
         const evaluacion_sam_unificada = crearTrialEvaluacionEmocional('post_bombero_oasis_strict');
 
         // Pagina final de cierre y guardado
@@ -559,19 +575,19 @@
         };
 
         jsPsych.run([
-            // bienvenida,
-            // pantalla,
-            // calibracion_hardware,
-            // //calibracion ojos
-            // instrucciones_1,
-            // bloque_laminas_cookie_aleatorio[0],
-            // instrucciones_medio, 
-            // bloque_laminas_oasis_aleatorio[0],
-            // calibracion_hardware,
-            // //calibracion ojos
-            // instrucciones_medio,
-            // bloque_laminas_cookie_aleatorio[1],
-            // instrucciones_sam,
+            bienvenida,
+            pantalla,
+            calibracion_hardware,
+            //calibracion ojos
+            instrucciones_1,
+            bloque_laminas_cookie_aleatorio[0],
+            instrucciones_medio, 
+            bloque_laminas_oasis_aleatorio[0],
+            calibracion_hardware,
+            //calibracion ojos
+            instrucciones_medio,
+            bloque_laminas_cookie_aleatorio[1],
+            instrucciones_sam,
             evaluacion_sam_unificada,
             pantalla_final
         ]);

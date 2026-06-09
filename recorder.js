@@ -233,8 +233,35 @@ function esperarQueTermineLaCola() {
 }
 
 function apagarCamaraYMicrofono() {
-    if (streamFisico) {
-        streamFisico.getTracks().forEach(track => track.stop());
-        console.log("Hardware liberado y apagado.");
+    console.log("[Hardware] Iniciando apagado forzado de periféricos...");
+
+    // 1. Apagamos el stream global si existe
+    if (window.streamFisico) {
+        window.streamFisico.getTracks().forEach(track => {
+            track.stop();
+            console.log(`[Hardware] Pista global ${track.kind} apagada.`);
+        });
+        window.streamFisico = null;
     }
+
+    // 2. Por las dudas, apagamos el stream local del grabador
+    if (typeof stream !== 'undefined' && stream) {
+        stream.getTracks().forEach(track => {
+            track.stop();
+            console.log(`[Hardware] Pista local ${track.kind} apagada.`);
+        });
+    }
+
+    // 3. LA LLAVE MAESTRA: Le pedimos al navegador todas las pistas activas en la pestaña y las matamos
+    navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+        .then(activeStream => {
+            // Este truco agarra lo que esté colgado y lo frena
+            activeStream.getTracks().forEach(track => track.stop());
+        })
+        .catch(() => {
+            // Si ya no había nada, va a entrar acá, lo cual es buena señal
+            console.log("[Hardware] No quedaron flujos fantasma activos.");
+        });
+
+    console.log("[Hardware] Proceso de apagado completo. La luz de la cámara DEBERÍA apagarse ahora.");
 }
