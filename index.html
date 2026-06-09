@@ -107,19 +107,10 @@
         const jsPsych = initJsPsych();
 
         //Seguro anti-cierre de pestaña
+        let experimentoTerminado = false;
+
         window.addEventListener('beforeunload', function (e) {
-            try {
-                const progreso = jsPsych.getProgress();
-                // Si el trial actual es menor al total, clavamos el candado
-                if (progreso.current_trial_global < progreso.total_trials) {
-                    e.preventDefault();
-                    e.returnValue = ''; // <-- CRUCIAL: Sin esto, los navegadores modernos ignoran el bloqueo
-                }
-            } catch (err) {
-                // Si jsPsych no llegó a inicializar el progreso todavía, por las dudas bloqueamos el cierre
-                e.preventDefault();
-                e.returnValue = '';
-            }
+            if (!experimentoTerminado) e.preventDefault();
         });
         
         if (!run_id) {
@@ -433,6 +424,8 @@
                         document
                             .getElementById('btn-calibracion-hardware')
                             .addEventListener('click', function () {
+                                const video = document.getElementById('preview-camara');
+                                if (video) video.srcObject = null;
                                 jsPsych.finishTrial();
                             });
 
