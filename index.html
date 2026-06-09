@@ -105,6 +105,8 @@
 
     <script>
         const jsPsych = initJsPsych();
+        let animationId = null;
+        let audioContext = null;
 
         //Seguro anti-cierre de pestaña
         let experimentoTerminado = false;
@@ -237,10 +239,10 @@
 
         /**
          * Crea un trial unificado de evaluación emocional (Valencia y Arousal) utilizando emojis modernos.
-         * @param {string} [fase='post_bombero_oasis_strict'] - Etiqueta para identificar la fase en la base de datos.
+         * @param {string} [fase='evaluacion_sam'] - Etiqueta para identificar la fase en la base de datos.
          * @returns {Object} Configuración del trial para el timeline de jsPsych.
          */
-        function crearTrialEvaluacionEmocional(fase = 'post_bombero_oasis_strict') {
+        function crearTrialEvaluacionEmocional(fase = 'evaluacion_sam') {
             const val_opciones = [
                 ["🤬", "Muy malo /", "negativo"], ["😟", "Bastante", "malo"], ["🙁", "Un poco", "malo"],
                 ["😐", "Neutro", ""], ["🙂", "Un poco", "bueno"], ["😀", "Bastante", "bueno"], ["🚀", "Muy bueno /", "positivo"]
@@ -426,6 +428,8 @@
                             .addEventListener('click', function () {
                                 const video = document.getElementById('preview-camara');
                                 if (video) video.srcObject = null;
+                                if (animationId) {cancelAnimationFrame(animationId);}
+                                if (audioContext) {audioContext.close(); }
                                 jsPsych.finishTrial();
                             });
 
@@ -436,7 +440,7 @@
                             document.getElementById('cuadrado-camara').style.display = 'block';
                         };
 
-                        const audioContext = new AudioContext();
+                        audioContext = new AudioContext();
                         const source = audioContext.createMediaStreamSource(stream);
                         const analyser = audioContext.createAnalyser();
                         analyser.fftSize = 256;
@@ -472,8 +476,7 @@
                                 document.getElementById('btn-calibracion-hardware').disabled = false;
                             }
 
-                            requestAnimationFrame(updateBar);
-                        }
+                            animationId = requestAnimationFrame(updateBar);                        }
                         updateBar();
                         inicializarGrabador(stream);
                     })
@@ -540,7 +543,7 @@
         // Aleatorización de las imagenes de Oasis
         const bloque_laminas_oasis_aleatorio = jsPsych.randomization.shuffle([lamina_oasis_1, lamina_oasis_2, lamina_oasis_3, lamina_oasis_4]);
         
-        const evaluacion_sam_unificada = crearTrialEvaluacionEmocional('post_bombero_oasis_strict');
+        const evaluacion_sam_unificada = crearTrialEvaluacionEmocional('evaluacion_sam');
 
         // Pagina final de cierre y guardado
         const pantalla_final = {
@@ -558,11 +561,17 @@
 
                 esperarQueTermineLaCola().then(() => {
                     console.log("[Final] ¡La fila de videos se vació por completo! Todo a salvo en el servidor.");
+                    apagarCamaraYMicrofono();
                     ocultarPantallaCarga(); 
                     
                     if (typeof finishExperiment === 'function') {
                         finishExperiment(); 
                     }
+                })
+                .catch(error => {
+                    console.error("[Final] Error:", error);
+                    apagarCamaraYMicrofono();
+                    ocultarPantallaCarga();
                 });
             },
         };

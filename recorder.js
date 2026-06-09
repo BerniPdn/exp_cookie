@@ -8,6 +8,8 @@ let fragmentosVideo = [];
 let intervaloTimer = null;
 let streamFisico = null;
 let colaSubidas = Promise.resolve();
+let frenando = false;
+
 
 function inicializarGrabador(stream) {
     streamFisico = stream;
@@ -171,6 +173,11 @@ function ocultarPantallaCarga() {
 */
 function frenarYEnviarServidor(nombreArchivo) {
     if (intervaloTimer) clearInterval(intervaloTimer);
+
+    if (frenando) {
+        console.warn(`[Fila] Ya se está frenando ${nombreArchivo}. Ignorado.`);
+        return;
+    }
     
     // Esto evita que el click manual y el timer automático choquen y vacíen el array dos veces.
     if (!grabadorMedia || grabadorMedia.state === "inactive") {
@@ -181,6 +188,7 @@ function frenarYEnviarServidor(nombreArchivo) {
     console.log(`[Fila] Iniciando proceso de frenado para: ${nombreArchivo}. State actual: ${grabadorMedia.state}`);
  
     grabadorMedia.onstop = function() {
+        frenando = false;
         if (fragmentosVideo.length === 0) {
             console.warn(`[Fila] Alerta preventiva: El array global ya estaba vacío en onstop para ${nombreArchivo}.`);
             return;
@@ -199,29 +207,21 @@ function frenarYEnviarServidor(nombreArchivo) {
         const esTimeoutReal = datosActualesJsPsych.timeout || false;
  
         colaSubidas = colaSubidas.then(() => {
-            console.log(`[Cola] -> Arrancando transmisión de fondo: ${nombreArchivo} (${videoBlob.size} bytes)`);
-            
-            return recordVideo(videoBlob, `grabacion_${run_id}_${nombreArchivo}`)
+            return Promise.race ([
+                recordVideo(videoBlob, `grabacion_${run_id}_${nombreArchivo}`),
+                new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout de subida")), 120000))
+            ])
                 .then(() => {
-                    const trialData = jsPsych.data.get().last(1).values()[0] || {};
-                    return recordData({
-                        trial: nombreArchivo,
-                        rt: rtCapturado,
-                        timeout: esTimeoutReal
-                    });
-                })
-                .then(() => {
-                    console.log(`[Cola] -> ¡Éxito en el servidor para: ${nombreArchivo}!`);
+                    return recordData({trial: nombreArchivo,});
                 })
                 .catch(error => {
                     console.error(`[Cola] -> Error de red en fondo para ${nombreArchivo}:`, error);
                 });
         });
- 
         console.log(`[Cola] Liberando pantalla del paciente.`);
         jsPsych.finishTrial();
     };
- 
+    grabadorMedia.requestData();
     grabadorMedia.stop();
  }
 
