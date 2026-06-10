@@ -9,7 +9,6 @@
     <script src="https://unpkg.com/@jspsych/plugin-html-button-response@2.0.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-fullscreen@2.0.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.0.0"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-call-function@2.0.0"></script>
 
     <link href= "https://unpkg.com/jspsych@8.2.3/css/jspsych.css" rel="stylesheet">
 
@@ -128,7 +127,6 @@
         });
         let animationId = null;
         let audioContext = null;
-        let intentos_calibracion = 0;
 
         //Seguro anti-cierre de pestaña
         let experimentoTerminado = false;
@@ -163,15 +161,6 @@
          function crearTrialImagen(src, nombreArchivo = null, tiempo) {
             return {
                 type: jsPsychHtmlButtonResponse,
-                extensions: [
-                    {
-                        type: jsPsychExtensionWebgazer,
-                        params: {
-                            targets: ['#estimulo-imagen']
-                        }
-                    }
-                ],
-
                 stimulus: /*html*/ `
                     <div class="wrapper-experimento">
                         <div class="card-experimento">
@@ -233,16 +222,6 @@
                         frenarYEnviarServidor(nombreArchivo);
                     });
                 },
-                
-                on_finish: function(data) {
-                    recordData({
-                        trial: nombreArchivo,
-                        webgazer_data: data.webgazer_data,
-                        webgazer_targets: data.webgazer_targets
-                    }).catch(error => {
-                        console.error("Error guardando eye tracking:", error);
-                    });  
-                }
             }
         }
 
@@ -398,6 +377,7 @@
                     </div>
                 </div>`,
             choices: ['Siguiente'],
+            // Estilo unificado para el botón "Siguiente"
         };
 
         const pantalla = {
@@ -406,52 +386,81 @@
             message: '<h3>El experimento ira a pantalla completa cuando presiones el boton que se encuentra abajo</h3>',
             button_label: 'Ir a pantalla completa'
         }
-        
-        const calibracion_mic = {
+
+        const calibracion_hardware = {
             type: jsPsychHtmlButtonResponse,
             stimulus: /*html*/ `
-            <div class="wrapper-experimento">
-                <div class="card-experimento">
-                    <span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 700; color: #2563eb; display: block; margin-bottom: 10px;">Paso Previo Requerido</span>
-                    <h2 style="margin: 0 0 10px 0; font-size: 1.9rem; font-weight: 800; color: #1e293b;">Verificación de Micrófono</h2>
-                    <p style="color: #64748b; margin-bottom: 35px;">Asegurémonos de que tu micrófono funcione correctamente antes de empezar.</p>
+                <div class="wrapper-experimento wide">
+                    <div class="card-experimento">
+                        <span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 700; color: #2563eb; display: block; margin-bottom: 10px;">Paso Previo Requerido</span>
+                        <h2 style="margin: 0 0 10px 0; font-size: 1.9rem; font-weight: 800; color: #1e293b;">Verificación de Periféricos</h2>
+                        <p style="color: #64748b; margin-bottom: 35px;">Asegurémonos de que tu micrófono y cámara funcionen correctamente antes de empezar.</p>
 
-                    <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 25px 30px; border-radius: 12px; margin-bottom: 35px; text-align: left;">
-                        <h3 style="margin: 0 0 8px 0; font-size: 1.2rem; color: #1e293b;">🎙️ Verificación de micrófono</h3>
-                        <p style="margin-bottom: 15px; font-size: 0.95rem; color: #475569;">Hablá en voz alta frente a tu dispositivo y fijate que la barra se mueva. Si no se mueve, intenta hablar un poco más fuerte.</p>
-                        <div style="background: #e2e8f0; border-radius: 9999px; height: 16px; overflow: hidden; border: 1px solid #cbd5e1;">
-                            <div id="barra-audio" style="height: 100%; width: 0%; background: #22c55e; transition: width 0.1s;"></div>
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 25px; text-align: left; margin-bottom: 35px;">
+                            
+                            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px 25px; border-radius: 12px;">
+                                <h3 style="margin: 0 0 8px 0; font-size: 1.2rem; color: #1e293b;">🎙️ Verificación de micrófono</h3>
+                                <p style="margin-bottom: 15px; font-size: 0.95rem; color: #475569;">Hablá en voz alta y fijate que la barra se mueva. Si no se mueve intenta hablar un poco más fuerte.</p>
+                                <div style="background: #e2e8f0; border-radius: 9999px; height: 16px; overflow: hidden; border: 1px solid #cbd5e1;">
+                                    <div id="barra-audio" style="height: 100%; width: 0%; background: #22c55e; transition: width 0.1s;"></div>
+                                </div>
+                            </div>
+
+                            <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 20px 25px; border-radius: 12px;">
+                                <h3 style="margin: 0 0 8px 0; font-size: 1.2rem; color: #1e293b;">📷 Verificación de cámara</h3>
+                                <p style="margin-bottom: 15px; font-size: 0.95rem; color: #475569;">Asegurate que tu cara esté y en el cuadrado verde que aparece en la pantalla de abajo y que se vea claramente. Intenta no moverte mucho durante el experimento.</p>
+                                
+                                <div id="contenedor-camara" style="position: relative; width: 100%; max-width: 500px; height: 310px; margin: 0 auto; background: #0f172a; border-radius: 8px; overflow: hidden; border: 2px solid #cbd5e1;">
+                                    <video id="preview-camara" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover; visibility: hidden;"></video>
+                                    <div id="cuadrado-camara" style="position: absolute; top: 50%; left: 50%; width: 220px; height: 220px; border: 4px solid #22c55e; transform: translate(-50%, -50%); border-radius: 10px; pointer-events: none; display: none;"></div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <p id="estado-mic-cam" style="color: #64748b; font-weight: 600; margin-bottom: 25px;">⏳ Iniciando micrófono y cámara...</p>
+                        
+                        <div>
+                            <button id="btn-calibracion-hardware" class="jspsych-btn" disabled>
+                                Calibración de audio y cámara lista
+                            </button>
                         </div>
                     </div>
-
-                    <p id="estado-mic-cam" style="color: #64748b; font-weight: 600; margin-bottom: 25px;">⏳ Iniciando micrófono...</p>
-                    
-                    <div>
-                        <button id="btn-calibracion" class="jspsych-btn" disabled>
-                            Calibración de audio lista
-                        </button>
-                    </div>
-                </div>
-            </div>`,
+             </div>`,
             choices: [],
 
             on_load: function () {
                 const constraints = {
                     audio: true,
-                    video: true
+                    video: {
+                        width: {min: 1280, ideal: 1280, max: 1920},
+                        height: {min: 720, ideal: 720, max: 1080},
+                        frameRate: {ideal: 30, max: 30}
+                    }
                 };
 
                 navigator.mediaDevices.getUserMedia(constraints)
                     .then(function (stream) {
-                        document.getElementById('estado-mic-cam').textContent = 'Micrófono activo.';
+                        document.getElementById('estado-mic-cam').textContent = 'Micrófono y camara activos.';
                         document.getElementById('estado-mic-cam').style.color = 'green';
                         document
-                            .getElementById('btn-calibracion')
+                            .getElementById('btn-calibracion-hardware')
                             .addEventListener('click', function () {
+                                const video = document.getElementById('preview-camara');
+                                if (video) video.srcObject = null;
+                                if (animationId) {cancelAnimationFrame(animationId);}
+                                if (audioContext) {audioContext.close(); }
                                 jsPsych.finishTrial();
                             });
 
-                        const audioContext = new AudioContext();
+                        const video = document.getElementById('preview-camara');
+                        video.srcObject = stream;
+                        video.onloadedmetadata = function () {
+                            video.style.visibility = 'visible';
+                            document.getElementById('cuadrado-camara').style.display = 'block';
+                        };
+
+                        audioContext = new AudioContext();
                         const source = audioContext.createMediaStreamSource(stream);
                         const analyser = audioContext.createAnalyser();
                         analyser.fftSize = 256;
@@ -484,180 +493,21 @@
 
                             //Habilitar boton si el promedio se mueve bien con la voz
                             if (volumenSuave > 25) {
-                                document.getElementById('btn-calibracion').disabled = false;
+                                document.getElementById('btn-calibracion-hardware').disabled = false;
                             }
 
-                            requestAnimationFrame(updateBar);
-                        }
+                            animationId = requestAnimationFrame(updateBar);                        }
                         updateBar();
                         inicializarGrabador(stream);
                     })
                     .catch(function () {
                         document.getElementById('estado-mic-cam').textContent = 
-                            'No se pudo acceder al micrófono. Revisá los permisos.';
+                            'No se pudo acceder al micrófono y/o la camara. Revisá los permisos.';
                         document.getElementById('estado-mic-cam').style.color = 'red';
                     });
             }
         }
         
-        const iniciar_webgazer = {
-            type: jsPsychWebgazerInitCamera,
-            instructions: /*html*/ `
-                <div class="wrapper-experimento">
-                    <div class="card-experimento">
-
-                        <span style="text-transform: uppercase; font-size: 0.85rem; font-weight: 700; color: #64748b;">
-                            Paso previo Requerido
-                        </span>
-
-                        <h2 style="margin: 0 0 15px 0; font-size: 1.9rem; font-weight: 800; color: #1e293b;">Configuracion de Seguimiento Ocular</h2>
-                        
-                        <h3 style="margin: 0 0 30px 0; font-size: 1.2rem; font-weight: 500; color: #475569;">Para que el seguimiento ocular sea exitoso te pedimos que: </h3>
-
-                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 30px 25px; border-radius: 12px; margin-bottom: 20px;">
-                            <ul style="margin: 0; padding: 0;">
-                                <li style="position: relative; padding-left: 35px; margin-bottom: 18px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
-                                    <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
-                                    Mantengas tu rostro visible frente a la pantalla.
-                                </li>
-                                <li style="position: relative; padding-left: 35px; margin-bottom: 18px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
-                                    <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
-                                    Minimices movimientos durante la tarea.
-                                </li>
-                                <li style="position: relative; padding-left: 35px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
-                                    <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
-                                    Durante la calibracion sigas los puntos de que van a aparecer en la pantalla con la mirada.
-                                </li>
-                                <li style="position: relative; padding-left: 35px; font-size: 1.1rem; color: #334155; text-align: left; list-style: none;">
-                                    <span style="position: absolute; left: 0; top: 2px; color: #2563eb; font-weight: bold; font-size: 1.2rem;">✓</span>
-                                    Mantengas la mirada en cada punto hasta que desaparezca. No intentes predecir la ubicacion del siguiente punto.
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>`
-        };
-
-        const calibracion = {
-            type: jsPsychWebgazerCalibrate,
-            calibration_points: [
-                [25, 25], [50, 25], [75, 25],
-                [25, 50], [50, 50], [75, 50],
-                [25, 75], [50, 75], [75, 75]
-            ],
-            repetitions_per_point: 2,
-            randomize_calibration_order: true,
-            calibration_mode: "view",
-            time_per_point: 1000
-        };
-        
-        const validacion = {
-            type: jsPsychWebgazerValidate,
-            validation_points: [
-                [25, 25], [50, 25], [75, 25],
-                [25, 50], [50, 50], [75, 50],
-                [25, 75], [50, 75], [75, 75]
-            ],
-            roi_radius: 200,
-            time_to_saccade: 1000,
-            validation_duration: 2000,
-
-            on_finish: function(data) {
-
-            // calcular promedio
-            const promedio =
-                data.percent_in_roi.reduce((a,b) => a+b, 0) /
-                data.percent_in_roi.length;
-
-                // guardar en jsPsych
-                data.intento_calibracion = intentos_calibracion + 1;
-                data.validacion_promedio = promedio;
-                data.calibracion_aprobada = promedio >= 70;
-            }       
-        };
-
-        const mensaje_recalibracion = {
-            timeline: [{
-                type: jsPsychHtmlButtonResponse,
-                stimulus: `
-                    <h2>One more quick step</h2>
-                    <p>To optimize the eye tracker, we will repeat the calibration procedure one more time.</p>
-                `,
-                choices: ["Continue"]
-            }],
-
-            conditional_function: function() {
-
-                const ultima = jsPsych.data
-                    .get()
-                    .filter({ trial_type: "webgazer-validate" })
-                    .last(1)
-                    .values()[0];
-
-                return (
-                !ultima.calibracion_aprobada &&
-                intentos_calibracion === 0
-                );
-            }
-        };
-
-        const bloque_calibracion = {
-            timeline: [
-                calibracion,
-                validacion,
-                mensaje_recalibracion
-            ],
-
-            loop_function: function() {
-
-                const ultima = jsPsych.data
-                    .get()
-                    .filter({ trial_type: "webgazer-validate" })
-                    .last(1)
-                    .values()[0];
-
-                console.log(
-                    `Intento ${ultima.intento_calibracion}: ${ultima.validacion_promedio.toFixed(1)}%`
-                );
-
-                const repetir =
-                    !ultima.calibracion_aprobada &&
-                    intentos_calibracion < 1;
-
-                intentos_calibracion++;
-
-                return repetir;
-            }
-        };
-
-        const guardar_validacion = {
-            type: jsPsychCallFunction,
-            async: true,
-
-            func: async function(done) {
-                const validaciones = jsPsych.data
-                    .get()
-                    .filter({ trial_type: "webgazer-validate" })
-                    .values();
-                const ultima = validaciones[validaciones.length - 1];
-                try {
-                    await recordData({
-                        trial: "webgazer_validation",
-                        intentos_calibracion: validaciones.length,
-                        validacion_promedio: ultima.validacion_promedio,
-                        calibracion_aprobada: ultima.calibracion_aprobada
-                    });
-                    console.log(" Validación guardada en el servidor");
-                } catch(error) {
-                    console.error(
-                        "Error guardando validación:",
-                        error
-                    );
-                }
-                done();
-            }
-        };
-
         //
         //Configuracion de las plantillas de instrucciones
         //
@@ -749,13 +599,14 @@
         jsPsych.run([
             bienvenida,
             pantalla,
-            calibracion_mic,
-            iniciar_webgazer,
-            bloque_calibracion,
+            calibracion_hardware,
+            //calibracion ojos
             instrucciones_1,
             bloque_laminas_cookie_aleatorio[0],
             instrucciones_medio, 
             bloque_laminas_oasis_aleatorio[0],
+            calibracion_hardware,
+            //calibracion ojos
             instrucciones_medio,
             bloque_laminas_cookie_aleatorio[1],
             instrucciones_sam,
