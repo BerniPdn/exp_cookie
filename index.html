@@ -11,7 +11,13 @@
     <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.0.0"></script>
 
     <link href= "https://unpkg.com/jspsych@8.2.3/css/jspsych.css" rel="stylesheet">
-    
+
+    <script src="https://cdn.jsdelivr.net/gh/jspsych/jspsych@jspsych@7.0.0/examples/js/webgazer/webgazer.js"></script>
+    <script src="https://unpkg.com/@jspsych/extension-webgazer@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-webgazer-init-camera@2.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-webgazer-calibrate@2.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-webgazer-validate@2.0.0"></script>
+
     <script src="runtime.js"></script>
     <script src="recorder.js"></script>
 </head>
@@ -107,7 +113,18 @@
     </style>
 
     <script>
-        const jsPsych = initJsPsych();
+        const jsPsych = initJsPsych({
+            extensions: [
+                {
+                    type: jsPsychExtensionWebgazer,
+                    params: {
+                        auto_initialize: false,
+                        round_predictions: true,
+                        sampling_interval: 34
+                    }
+                }
+            ]
+        });
         let animationId = null;
         let audioContext = null;
 
