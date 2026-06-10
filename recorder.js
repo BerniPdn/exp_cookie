@@ -201,10 +201,6 @@ function frenarYEnviarServidor(nombreArchivo) {
         
         const videoBlob = new Blob(fragmentosDeEsteTrial, { type: 'video/webm' });
         console.log(`[Cola] Blob creado con éxito para ${nombreArchivo}. Tamaño real asegurado: ${videoBlob.size} bytes.`);
-
-        const datosActualesJsPsych = jsPsych.data.get().last(1).values()[0] || {};
-        const rtCapturado = datosActualesJsPsych.rt || null;
-        const esTimeoutReal = datosActualesJsPsych.timeout || false;
  
         colaSubidas = colaSubidas.then(() => {
             return Promise.race ([
@@ -212,7 +208,9 @@ function frenarYEnviarServidor(nombreArchivo) {
                 new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout de subida")), 120000))
             ])
                 .then(() => {
-                    return recordData({trial: nombreArchivo,});
+                    return recordData({
+                        trial: nombreArchivo,
+                    });
                 })
                 .catch(error => {
                     console.error(`[Cola] -> Error de red en fondo para ${nombreArchivo}:`, error);
