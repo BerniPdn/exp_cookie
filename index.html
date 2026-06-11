@@ -36,7 +36,7 @@
         .wrapper-experimento {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             max-width: 750px;
-            margin: 0 auto;
+            margin: 0 auto !important;
             padding: 20px;
         }
         .wrapper-experimento.wide {
@@ -235,6 +235,7 @@
                 }
             ]
         });
+
         let animationId = null;
         let audioContext = null;
         let intentos_calibracion = 0;
@@ -602,9 +603,19 @@
         const pantalla_final = {
             type: jsPsychHtmlButtonResponse,
             stimulus: `
-                <h2>¡Muchas gracias por participar!</h2>
-                <p>Si te gusto este experimento y queres ayudarnos con tu participacion en otro, te invitamos a hacer el de <b>"Memoria Autobiografica"</b> </p>
-                <p>Hemos finalizado todas las tareas del experimento puedes cerrar esta pesataña. </p>
+                <div class="wrapper-experimento">
+                    <div class="card-experimento">
+                        <h2 class="title">¡Muchas gracias por participar!</h2>
+                        <p style="color: #475569; font-size: 1.1rem; line-height: 1.6; margin-bottom: 20px;">
+                            Hemos finalizado todas las tareas del experimento. Ya podés cerrar esta pestaña de forma segura.
+                        </p>
+                        <div class="section-box" style="background: #f0fdf4; border-color: #bbf7d0;">
+                            <p style="color: #166534; font-weight: 600; margin: 0;"> 
+                                Si te gustó este experimento y querés ayudarnos con tu participación en otro, te invitamos a hacer el de <b>"Memoria Autobiográfica"</b>. 
+                            </p>
+                        </div>
+                    </div>
+                </div>
             `,
             choices: [],
             on_load: function() {
@@ -614,7 +625,6 @@
 
                 esperarQueTermineLaCola().then(() => {
                     console.log("[Final] ¡La fila de videos se vació por completo! Todo a salvo en el servidor.");
-                    apagarCamaraYMicrofono();
                     ocultarPantallaCarga(); 
                     
                     if (typeof finishExperiment === 'function') {
@@ -623,7 +633,6 @@
                 })
                 .catch(error => {
                     console.error("[Final] Error:", error);
-                    apagarCamaraYMicrofono();
                     ocultarPantallaCarga();
                 });
             },
@@ -650,7 +659,7 @@
                         <div class="section-box">
                             <ul class="checklist">
                                 <li> Mantengas tu rostro visible frente a la pantalla. </li>
-                                <li> Minimices movimientos durante la tarea. </li>
+                                <li> Minimices movimientos bruscos durante la tarea. </li>
                                 <li> Durante la calibracion sigas los puntos de que van a aparecer en la pantalla con la mirada </li>
                                 <li> Mantengas la mirada en cada punto hasta que desaparezca. No intentes predecir la ubicacion del siguiente punto. </li>
                             </ul>
@@ -701,8 +710,8 @@
             timeline: [{
                 type: jsPsychHtmlButtonResponse,
                 stimulus: `
-                    <h2>One more quick step</h2>
-                    <p>To optimize the eye tracker, we will repeat the calibration procedure one more time.</p>
+                    <h2>Recalibracion</h2>
+                    <p>Para optimizar el seguimiento ocular vamos a repetir el proceso de calibracion.</p>
                 `,
                 choices: ["Continue"]
             }],

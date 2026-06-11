@@ -74,7 +74,15 @@ function endExperiment(score) {
 
 /* App */
 async function finishExperiment() {
-	experimentoTerminado = true;
+    experimentoTerminado = true;
     endExperiment(100);
     apagarCamaraYMicrofono();
+    
+    // Matar el stream de WebGazer
+    document.querySelectorAll('video').forEach(v => {
+        if (v.srcObject) {
+            v.srcObject.getTracks().forEach(t => t.stop());
+            v.srcObject = null;
+        }
+    });
 }
