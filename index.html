@@ -271,6 +271,8 @@
          * Controla que la grabación y el timer inicien SOLO cuando la imagen está visible.
          */
          function crearTrialImagen(src, nombreArchivo = null, tiempo) {
+            let rectImagen = null;
+
             return {
                 type: jsPsychHtmlButtonResponse,
                 extensions: [
@@ -324,8 +326,12 @@
                             btnEnviar.style.cursor = 'pointer';
                         }
 
-                        comenzarGrabacion();
-                        iniciarTimerVisual(tiempo, nombreArchivo);
+                        requestAnimationFrame(() => {
+                            rectImagen = img.getBoundingClientRect();  // ← NUEVO: capturar rect
+                            console.log(`[Rect] ${nombreArchivo}:`, rectImagen);
+                            comenzarGrabacion();
+                            iniciarTimerVisual(tiempo, nombreArchivo);
+                        });
                     }
 
                     if (img.complete && img.naturalWidth !== 0) {
@@ -345,10 +351,19 @@
                 },
                 
                 on_finish: function(data) {
+                    const img = document.getElementById('estimulo-imagen');
+                    const rect = img ? img.getBoundingClientRect() : null;
+
                     recordData({
                         trial: nombreArchivo,
+                        duracion_ms: data.rt, 
                         webgazer_data: data.webgazer_data,
-                        webgazer_targets: data.webgazer_targets
+                        imagen_rect: rectImagen ? { 
+                            x: rectImagen.x,
+                            y: rectImagen.y,
+                            width: rectImagen.width,
+                            height: rectImagen.height
+                        } : null
                     }).catch(error => {
                         console.error("Error guardando eye tracking:", error);
                     });  
@@ -472,6 +487,45 @@
                 }
             };
         }
+
+        /* =========================================================
+            INSTRUCCIONES
+        ========================================================= */
+        const instrucciones_1 = crearInstrucciones(
+            'Instrucciones',
+            [
+                'Para este experimento te vamos a mostrar 3 imagenes distintas.',
+                'Para cada una te pedimos que describas todo lo que está pasando en 1 minuto como si se la estuvieses describiendo a alguien que no puede verla.',
+                'Cuando termines, presioná <b>Enviar</b> para guardar tus resultados y pasar a la siguiente imagen.',
+                'Si te excedés del tiempo, el experimento pasará directamente a la siguiente imagen.'
+            ]
+        );
+
+        const instrucciones_medio = crearInstrucciones(
+            'Instrucciones',
+            [
+                'Tomate el tiempo que necesites antes de avanzar a la siguiente imagen',
+                'Cuando estes listo, presiona siguiente y como con la imagen anterior tenes 1 minuto para describir todo lo que está pasando, como si se la explicaras a alguien que no puede verla.'
+            ],
+            'Siguiente'
+        );
+
+        const instrucciones_sam = crearInstrucciones(
+            'Instrucciones',
+            [
+                'Por ultimo te pedimos que completes un pequeño formulario sobre tus emociones',
+            ],
+            'Siguiente'
+        );
+
+        const instrucciones_recalibracion = crearInstrucciones(
+            'Recalibración de Seguimiento Ocular',
+            [
+                'Antes de continuar vamos a realizar una breve recalibración del seguimiento ocular.',
+                'Seguí los puntos con la mirada como lo hiciste al principio.'
+            ],
+            'Comenzar recalibración'
+        );
 
 
         /* =========================================================
@@ -788,36 +842,13 @@
             }
         };
 
-
-       /* =========================================================
-            INSTRUCCIONES
-        ========================================================= */
-        const instrucciones_1 = crearInstrucciones(
-            'Instrucciones',
-            [
-                'Para este experimento te vamos a mostrar 3 imagenes distintas.',
-                'Para cada una te pedimos que describas todo lo que está pasando en 1 minuto como si se la estuvieses describiendo a alguien que no puede verla.',
-                'Cuando termines, presioná <b>Enviar</b> para guardar tus resultados y pasar a la siguiente imagen.',
-                'Si te excedés del tiempo, el experimento pasará directamente a la siguiente imagen.'
+        const recalibracion_cookie = {
+            timeline: [
+                instrucciones_recalibracion,
+                calibracion,
+                validacion
             ]
-        );
-
-        const instrucciones_medio = crearInstrucciones(
-            'Instrucciones',
-            [
-                'Tomate el tiempo que necesites antes de avanzar a la siguiente imagen',
-                'Cuando estes listo, presiona siguiente y como con la imagen anterior tenes 1 minuto para describir todo lo que está pasando, como si se la explicaras a alguien que no puede verla.'
-            ],
-            'Siguiente'
-        );
-
-        const instrucciones_sam = crearInstrucciones(
-            'Instrucciones',
-            [
-                'Por ultimo te pedimos que completes un pequeño formulario sobre tus emociones',
-            ],
-            'Siguiente'
-        );
+        };
 
 
        /* =========================================================
@@ -849,7 +880,7 @@
 
 
         /* =========================================================
-                TIMELINE FINAL
+            TIMELINE FINAL
         ========================================================= */
         jsPsych.run([
             bienvenida,
@@ -857,10 +888,13 @@
             calibracion_mic,
             iniciar_webgazer,
             bloque_calibracion,
+            guardar_validacion,
             instrucciones_1,
             bloque_laminas_cookie_aleatorio[0],
             instrucciones_medio, 
             bloque_laminas_oasis_aleatorio[0],
+            recalibracion_cookie,
+            guardar_validacion,
             instrucciones_medio,
             bloque_laminas_cookie_aleatorio[1],
             instrucciones_sam,
