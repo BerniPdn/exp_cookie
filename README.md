@@ -38,4 +38,4 @@ El experimento opera bajo una arquitectura desacoplada:
 
 ## 👥 Estado del Piloto
 Fase de pruebas técnicas validada con una muestra inicial de **5 usuarios**.
-Reporte de calidad: 
+Reporte de calidad: n
