@@ -72,7 +72,7 @@ def arreglar_videos_en_lote():
 
 
 def analizar_volumen_seguro(ruta):
-    metricas = {"volumen_medio_db": None, "silencio_detectado": False}
+    """Mide el audio de forma aislada y devuelve solo el valor del volumen en dB (float o None)."""
     try:
         out = subprocess.run(
             ["ffmpeg", "-i", str(ruta), "-af", "volumedetect", "-vn", "-f", "null", "-"],
@@ -80,18 +80,10 @@ def analizar_volumen_seguro(ruta):
         )
         m_mean = re.search(r"mean_volume:\s*([-\d.]+)\s*dB", out.stderr)
         if m_mean:
-            metricas["volumen_medio_db"] = float(m_mean.group(1))
-
-        sil = subprocess.run(
-            ["ffmpeg", "-i", str(ruta), "-af", "silencedetect=noise=-40dB:d=3", "-vn", "-f", "null", "-"],
-            capture_output=True, text=True, timeout=15
-        )
-        if "silence_start" in sil.stderr:
-            metricas["silencio_detectado"] = True
+            return float(m_mean.group(1))
     except Exception:
         pass
-    return metricas
-
+    return None 
 
 def contar_fps_real(ruta):
     """Cuenta frames reales dividido duracion. Lento pero confiable para WebM corruptos."""
@@ -132,8 +124,7 @@ def analizar_video(ruta):
         "peso_mb": round(ruta.stat().st_size / (1024 ** 2), 2),
         "resolucion": None,
         "fps": None,
-        "volumen_medio_db": None,
-        "silencio_detectado": False
+        "volumen_medio_db": None
     }
 
     cap = cv2.VideoCapture(str(ruta))
@@ -150,11 +141,11 @@ def analizar_video(ruta):
     if resultado["fps"] is None:
         resultado["fps"] = contar_fps_real(ruta)
 
-    resultado.update(analizar_volumen_seguro(ruta))
+    resultado["volumen_medio_db"] = analizar_volumen_seguro(ruta)
     return resultado
 
 
-def interpretar_calidad(fps_promedio, resoluciones, fps_valido, vol_medio, silencio):
+def interpretar_calidad(fps_promedio, resoluciones, fps_valido, vol_medio):
     res_str = ", ".join(resoluciones)
 
     if not fps_valido:
@@ -171,8 +162,6 @@ def interpretar_calidad(fps_promedio, resoluciones, fps_valido, vol_medio, silen
         comentario = f"Canal estable a {fps_promedio} FPS ({res_str} px)."
 
     alertas_audio = []
-    if silencio:
-        alertas_audio.append("silencio prolongado")
     if vol_medio is not None and vol_medio < -45:
         alertas_audio.append(f"volumen bajo ({vol_medio} dB)")
 
@@ -209,42 +198,40 @@ def main():
 
     for num, (run_id, archivos_usuario) in enumerate(grupos.items(), 1):
         print(f"Analizando usuario {num}/{len(grupos)} (Run-ID: ...{run_id[-12:]})...")
-        videos_info = [analizar_video(a) for a in archivos_usuario]
+        
+        # Iteramos y procesamos cada archivo de video de forma individual
+        for ruta_video in archivos_usuario:
+            v = analizar_video(ruta_video)
+            
+            # Evaluamos la calidad técnica de este video específico
+            resoluciones = [v["resolucion"]] if v["resolucion"] else []
+            fps_valido = v["fps"] is not None
+            
+            estado, calidad_audio, comentario = interpretar_calidad(
+                v["fps"] or 0, resoluciones, fps_valido, v["volumen_medio_db"]
+            )
 
-        resoluciones = list({v["resolucion"] for v in videos_info if v["resolucion"]})
-        lista_fps    = [v["fps"] for v in videos_info if v["fps"] is not None]
-        fps_promedio = round(sum(lista_fps) / len(lista_fps), 2) if lista_fps else 0
-        fps_valido   = len(lista_fps) > 0
-        peso_total   = round(sum(v["peso_mb"] for v in videos_info), 2)
-        volumenes    = [v["volumen_medio_db"] for v in videos_info if v["volumen_medio_db"] is not None]
-        vol_medio    = round(sum(volumenes) / len(volumenes), 1) if volumenes else None
-        silencio     = any(v["silencio_detectado"] for v in videos_info)
+            print(f"  Archivo:     {v['archivo']}")
+            print(f"  Resolucion:  {v['resolucion'] or '-'} px -> [{estado}]")
+            print(f"  FPS:         {v['fps'] if fps_valido else 'No recuperable'}")
+            print(f"  Volumen:     {f'{v['volumen_medio_db']} dB' if v['volumen_medio_db'] is not None else 'N/A'}")
+            print("-" * 50)
 
-        estado, calidad_audio, comentario = interpretar_calidad(
-            fps_promedio, resoluciones, fps_valido, vol_medio, silencio
-        )
+            # Guardamos los datos desglosados por video en el CSV
+            filas.append({
+                "Usuario (N)":        num,
+                "Run-ID":             run_id,
+                "Video":              v["archivo"],
+                "Tamano (MB)":        v["peso_mb"],
+                "Resolucion (px)":    v["resolucion"] or "-",
+                "FPS":                v["fps"] if fps_valido else "Error",
+                "Volumen medio (dB)": v["volumen_medio_db"] if v["volumen_medio_db"] is not None else "N/A",
+                "Calidad de Audio":   calidad_audio,
+                "Estado del canal":   estado,
+                "Comentario":         comentario,
+            })
 
-        print(f"  Archivos:    {len(archivos_usuario)} videos")
-        print(f"  Tamano:      {peso_total} MB")
-        print(f"  Resolucion:  {', '.join(resoluciones) or '-'} px -> [{estado}]")
-        print(f"  FPS:         {fps_promedio if fps_valido else 'No recuperable'}")
-        print(f"  Audio:       [{calidad_audio}]")
-        print(f"  Comentario:  {comentario}")
-        print("-" * 90)
-
-        filas.append({
-            "Usuario (N)":        num,
-            "Run-ID":             run_id,
-            "Videos en servidor": len(archivos_usuario),
-            "Tamano total (MB)":  peso_total,
-            "Resolucion (px)":    ", ".join(resoluciones) or "-",
-            "FPS":                fps_promedio if fps_valido else "Error",
-            "Volumen medio (dB)": vol_medio if vol_medio is not None else "N/A",
-            "Calidad de Audio":   calidad_audio,
-            "Estado del canal":   estado,
-            "Comentario":         comentario,
-        })
-
+    # Guardamos el archivo CSV definitivo
     with open(salida_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(filas[0].keys()))
         writer.writeheader()
