@@ -1,0 +1,16 @@
+cache: true
+
+base_path: null # set from environment variable
+
+features: 
+  - text:
+    - name: 'language'
+      language: 'es'
+      feature_set: ['coherence', 'fluence', 'speechgraph']
+
+splitter:
+  name: 'basicsampling' # 'upsampling'
+  repetitions: 500
+
+classifier:
+  pca: True
