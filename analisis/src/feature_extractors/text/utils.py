@@ -1,14 +1,18 @@
+import logging
 import spacy
 from spacy.cli import download
-from src.utils import logger
+
+# Logger estándar de Python — reemplaza el src.utils.logger que no existe en este repo
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 def get_transcript(sample):
     with open(sample.text_path, "r") as f:
         return f.read()
 
-
 def flatten_dict(d: dict):
-    # Flatten a dictionary recursively until it only contains scalars
+    # Aplana un dict anidado hasta que solo tenga escalares
+    # Ej: {"a": {"b": 1}} → {"a__b": 1}
     res = {}
     for k, v in d.items():
         if isinstance(v, dict):
@@ -20,10 +24,8 @@ def flatten_dict(d: dict):
 
 def ensure_model_installed(model_name):
     try:
-        # Try loading the model
         spacy.load(model_name)
-        logger.info(f"Model '{model_name}' is already installed.")
+        logger.info(f"Modelo '{model_name}' ya instalado.")
     except OSError:
-        # Download the model if it's not found
-        logger.info(f"Model '{model_name}' not found. Downloading now...")
+        logger.info(f"Modelo '{model_name}' no encontrado. Descargando...")
         download(model_name)
