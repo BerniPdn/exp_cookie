@@ -19,11 +19,11 @@ _SCRIPT_DIR = Path(__file__).parent  # carpeta donde vive este archivo .py
 CARPETA_TRANSCRIPCIONES = _SCRIPT_DIR / "transcripciones" / "limpias"
 
 # Definimos la carpeta que querés y la creamos de forma segura si no existe
-CARPETA_RESULTADOS = _SCRIPT_DIR / "resultados_transcripciones"
+CARPETA_RESULTADOS = _SCRIPT_DIR / "datos_transcripciones"
 CARPETA_RESULTADOS.mkdir(exist_ok=True)
 
 # Redireccionamos el archivo principal y la carpeta de resúmenes hacia la nueva ruta
-ARCHIVO_SALIDA = str(CARPETA_RESULTADOS / "resultados_analisis.csv")
+ARCHIVO_SALIDA = str(CARPETA_RESULTADOS / "datos_speechgraph.csv")
 CARPETA_RESUMENES = CARPETA_RESULTADOS
 
 LANG = "es"
