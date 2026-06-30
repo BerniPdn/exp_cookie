@@ -39,3 +39,20 @@ El experimento opera bajo una arquitectura desacoplada:
 ## 👥 Estado del Piloto
 Fase de pruebas técnicas validada con una muestra inicial de **5 usuarios**.
 Reporte de calidad: n
+
+## Data
+
+This repository does not include experimental data.
+
+Place the raw files in:
+
+```text
+data/raw/videos/
+data/raw/eye_tracking/
+```
+
+Then process the complete experiment with:
+
+```bash
+python3 -m procesamiento.pipelines.process_experiment
+```

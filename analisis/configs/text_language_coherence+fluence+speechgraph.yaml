@@ -6,7 +6,7 @@ features:
   - text:
     - name: 'language'
       language: 'es'
-      feature_set: ['coherence', 'fluence', 'speechgraph']
+      feature_set: ['coherence', 'fluence', 'lexical', 'speechgraph', 'syntax', 'utils']
 
 splitter:
   name: 'basicsampling' # 'upsampling'

@@ -4,6 +4,8 @@ import re
 from pathlib import Path
 import sys
 
+#ESTO HAY QUE TRANSFORMARLO A LO QUE SERIA UN ANALISIS DE TEXTO
+
 # ─── Importar los módulos del repo ────────────────────────────────
 sys.path.insert(0, str(Path(__file__).parent.parent / "analisis"))
 sys.path.insert(0, str(Path(__file__).parent.parent / "analisis" / "src"))
