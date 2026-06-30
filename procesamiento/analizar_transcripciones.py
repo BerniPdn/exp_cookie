@@ -5,8 +5,6 @@ from pathlib import Path
 import sys
 
 # ─── Importar los módulos del repo ────────────────────────────────
-# Asegurate de correr este script desde la raíz del repo (donde está /analisis)
-# Agregar tanto analisis/ como analisis/src/ al path
 sys.path.insert(0, str(Path(__file__).parent.parent / "analisis"))
 sys.path.insert(0, str(Path(__file__).parent.parent / "analisis" / "src"))
 
@@ -14,15 +12,11 @@ from feature_extractors.text.SpeechGraph import SpeechGraph
 from feature_extractors.text.Fluence import Fluence
 from feature_extractors.text.utils import flatten_dict
 
-# ─── 🛠️ CONFIGURACIÓN DE LA NUEVA CARPETA DE SALIDA ────────────────
-_SCRIPT_DIR = Path(__file__).parent  # carpeta donde vive este archivo .py
+# ─── CARPETA DE SALIDA ────────────────
+_SCRIPT_DIR = Path(__file__).parent
 CARPETA_TRANSCRIPCIONES = _SCRIPT_DIR / "transcripciones" / "limpias"
-
-# Definimos la carpeta que querés y la creamos de forma segura si no existe
 CARPETA_RESULTADOS = _SCRIPT_DIR / "datos_transcripciones"
 CARPETA_RESULTADOS.mkdir(exist_ok=True)
-
-# Redireccionamos el archivo principal y la carpeta de resúmenes hacia la nueva ruta
 ARCHIVO_SALIDA = str(CARPETA_RESULTADOS / "datos_speechgraph.csv")
 CARPETA_RESUMENES = CARPETA_RESULTADOS
 
