@@ -1,58 +1,157 @@
-# Experimento CookieJar: Lenguaje y Percepcion (jsPsych)
+# exp_cookie
 
-Este repositorio contiene la implementación del frontend para el experimento cognitivo **CookieJar**, desarrollado sobre el framework **jsPsych (v8.2.3)**. El sistema está diseñado para capturar de forma síncrona flujos de audio y video con el fin de analizar relatos verbales de imagenes combinados con métricas de seguimiento ocular remotos[cite: 1].
+**exp_cookie** is a multimodal experimental platform developed to investigate potential gender bias in the Cookie Theft picture.
 
-## 🚀 Características del Sistema
-* **Línea de Tiempo Multimétodo:** Combina calibración psicofísica, pruebas de descripción verbal y evaluación emocional reactiva.
-* **Aleatorización Completa:** Bloques aleatorios para las láminas de la prueba de las imagenes Cookie Theft (Variantes: Nueva Original, Nueva Invertida, Vieja Original, Vieja Invertida) y del set de imágenes emocionales OASIS[cite: 1].
-* **Garantía de Persistencia:** Cola de subidas asrincrónica (`Promise-driven`) combinada con un bloque *fallback* de descarga local inmediata en formato `.webm` ante fallas de red.
+The experiment was implemented in **jsPsych** and designed to run on **DataPruebas**, allowing participants to complete a picture description task while multiple behavioral data modalities are recorded simultaneously.
 
----
-
-## 🛠️ Especificaciones Técnicas de Calidad
-
-Para asegurar datos homogéneos aptos para modelos de análisis automatizado (como *WebGazer* o descriptores de microexpresiones faciales), se restringe el hardware bajo los siguientes parámetros:
-
-* **Resolución de Captura:** `1280 x 720` (HD 720p) mediante *constraints* de video para evitar la degradación automática a 480p que imponen los navegadores.
-* **Tasa de Refresco:** `30 FPS` constantes para el registro lineal de sacadas oculares.
-* **Compresión de Almacenamiento:** Bitrate forzado a `5.000.000 bps` (5 Mbps) con el códec `video/webm;codecs=vp8,opus` mediante `MediaRecorder`.
+The repository contains the complete experimental implementation, data preprocessing pipelines, and the infrastructure for future multimodal analyses.
 
 ---
 
-## 📂 Estructura Crítica del Código
+# Experiment
 
-* `index.html`: Inicializa jsPsych, carga las extensiones de WebGazer, define los estilos dinámicos de las tarjetas de la interfaz y estructura el *timeline* del experimento.
-* `recorder.js`: Administra los estados del hardware (`start`, `stop`, `requestData`), maneja el buffer temporal (`fragmentosVideo`) y coordina la pantalla de bloqueo informativa para el usuario durante la transferencia.
-* `runtime.js`: Capa de conectividad API. Gestiona las llamadas `POST` hacia los endpoints `/api/v1/record_data/` y `/api/v1/record_video/` inyectando tokens CSRF de seguridad.
-* `servidor.py`: Entorno local simulado (Flask) configurado en el puerto `8002` para emular el comportamiento del backend real de Datapruebas, procesando y almacenando los archivos `.webm` físicos.
+The experimental protocol consists of the following stages:
+
+- Informed consent
+- Camera and microphone setup
+- Eye-tracking calibration and validation
+- Description of two Cookie Theft pictures
+- Presentation of emotional images from the OASIS dataset
+- Post-task questionnaires
+
+During the experiment, the following data are collected:
+
+- Video recordings
+- Audio recordings
+- Eye-tracking data (WebGazer)
+- Experimental metadata
+
+## Cookie Theft Pictures
+
+The experiment compares two versions of the Cookie Theft picture:
+
+- **Original Cookie Theft Picture**
+- **Modified color version** with reversed parental roles
+
+The objective is to investigate whether changing the gender roles represented in the scene influences participants' visual attention and spontaneous language production.
+
+## Local Development
+
+For development and debugging purposes, the experiment can also be executed locally using the provided Flask server.
+
+Start the local server:
+
+```bash
+python experimento/servidor_local.py
+```
+
+The server emulates the main DataPruebas API endpoints used during the experiment, allowing local testing of:
+
+- Video uploads
+- Experimental metadata
+- Experiment completion
+
+By default, the server runs at:
+
+```
+http://localhost:8002 (to make it work you would need to comment in the two lines commented out in runtime.js)
+```
+
+When running locally, recorded videos are saved to the directory configured in `servidor_local.py`.
 
 ---
 
-## 📡 Flujo de Red y Contingencias
+# Repository Structure
 
-El experimento opera bajo una arquitectura desacoplada:
+```text
+exp_cookie/
 
-1. El frontend realiza la llamada de datos generales y genera un empaquetado binario (`Blob`) con la filmación de cada tarea.
-2. Si la variable `domain` apunta a un servidor sin permisos de escritura, la promesa del pipeline se interrumpe.
-3. El sistema activa automáticamente la contingencia en el navegador, descargando el archivo crudo directo al ordenador del participante.
+├── analysis/          Feature extraction and statistical analyses
+├── configs/           Project configuration files
+├── data/              Raw, processed, and result data
+├── experimento/       jsPsych experiment
+└── procesamiento/     Data preprocessing pipelines
+```
 
-## 👥 Estado del Piloto
-Fase de pruebas técnicas validada con una muestra inicial de **5 usuarios**.
-Reporte de calidad: n
+---
 
-## Data
+# Installation
 
-This repository does not include experimental data.
+Clone the repository:
 
-Place the raw files in:
+```bash
+git clone https://github.com/BerniPdn/exp_cookie.git
+cd exp_cookie
+```
+
+Install the required Python packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+**FFmpeg** must also be installed and available from the command line.
+
+---
+
+# Data Organization
+
+Raw experimental data should be placed inside:
 
 ```text
 data/raw/videos/
 data/raw/eye_tracking/
 ```
 
-Then process the complete experiment with:
+Processed files are automatically generated in:
+
+```text
+data/processed/
+```
+
+Quality reports and future analysis outputs are stored in:
+
+```text
+data/results/
+```
+
+---
+
+# Processing Pipeline
+
+Run the complete preprocessing pipeline with:
 
 ```bash
 python3 -m procesamiento.pipelines.process_experiment
 ```
+
+Or process each modality independently:
+
+```bash
+python3 -m procesamiento.pipelines.process_video_pipeline
+
+python3 -m procesamiento.pipelines.process_audio_pipeline
+
+python3 -m procesamiento.pipelines.process_eye_tracking_pipeline
+```
+
+---
+
+# Current Processing Modules
+
+The repository currently includes:
+
+- Video preprocessing
+- Audio extraction
+- Automatic transcription using Faster Whisper
+- Eye-tracking preprocessing
+- Video quality assessment
+- Modular processing pipelines
+
+The `analysis/` module contains the feature extraction and statistical analyses built on top of the processed data.
+
+---
+
+# License
+
+This repository was developed as part of a research project at the Laboratorio de Inteligencia Aplicada (LIAA)
