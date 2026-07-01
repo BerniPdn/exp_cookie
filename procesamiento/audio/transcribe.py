@@ -19,7 +19,7 @@ from faster_whisper import WhisperModel
 # Whisper configuration
 # ---------------------------------------------------------------------
 
-MODEL_NAME = "large-v3"
+MODEL_NAME = "medium"
 
 DEVICE = "cpu"
 

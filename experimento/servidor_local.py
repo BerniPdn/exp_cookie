@@ -6,13 +6,22 @@ Hecho con Gemini - Modificado para soportar la nueva API de record_video en el p
 """
 
 import os
+from pathlib import Path
 from flask import Flask, request, jsonify
 
-app = Flask(__name__)
+PORT = 8002
 
-# Creamos la carpeta donde se guardarán los videos si no existe
-CARPETA_GRABACIONES = '/Users/berni/Desktop/grabaciones_cookiejar'
-os.makedirs(CARPETA_GRABACIONES, exist_ok=True)
+CARPETA_GRABACIONES = (
+    Path(__file__).parent /
+    "local_recordings"
+)
+
+CARPETA_GRABACIONES.mkdir(
+    parents=True,
+    exist_ok=True,
+)
+
+app = Flask(__name__)
 
 # Configuración de cabeceras para permitir CORS (Cross-Origin Resource Sharing)
 @app.after_request
@@ -43,8 +52,8 @@ def record_video(run_id):
         return jsonify({"status": "FAIL", "error": "Nombre de archivo vacío"}), 400
 
     # Construimos la ruta de destino y guardamos el archivo físico en el disco
-    ruta_guardado = os.path.join(CARPETA_GRABACIONES, archivo.filename)
-    archivo.save(ruta_guardado)
+    ruta_guardado = CARPETA_GRABACIONES / archivo.filename
+    archivo.save(str(ruta_guardado))
     
     print(f"✅ ¡Video guardado con éxito localmente!")
     print(f"   📂 Ubicación: {ruta_guardado}")
@@ -83,4 +92,4 @@ if __name__ == '__main__':
     print(" Escuchando en: http://localhost:8002 ")
     print("====================================================")
     # CAMBIO CRÍTICO: Ahora corre en el puerto 8002 para que tu JavaScript no rebote
-    app.run(port=8002, debug=True)
+    app.run(port=PORT, debug=True)

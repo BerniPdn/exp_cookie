@@ -177,7 +177,7 @@ def extract_run_id(filename: str) -> str:
         return "unknown"
 
     # El run_id es el penúltimo elemento
-    return parts[-2]
+    return parts[1]
 
 def extract_trial(filename: str) -> str:
     """
@@ -197,11 +197,11 @@ def extract_trial(filename: str) -> str:
 
     parts = Path(filename).stem.split("_")
 
-    if len(parts) < 6:
+    if len(parts) < 2:
         return "unknown"
 
     # Todo lo que está entre el UUID y el run_id
-    return "_".join(parts[2:-2])
+    return parts[-2]
 
 def inspect_video(video_path: Path):
     """
