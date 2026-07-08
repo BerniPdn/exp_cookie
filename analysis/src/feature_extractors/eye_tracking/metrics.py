@@ -16,7 +16,7 @@ import argparse
 import pandas as pd
 
 from configs.paths import (
-    ANALYSIS_EYE_TRACKING_DIR,
+    EYE_TRACKING_RESULTS_DIR,
     ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR,
 )
 
@@ -30,7 +30,7 @@ INPUT_DIR = (
 )
 
 OUTPUT_DIR = (
-    ANALYSIS_EYE_TRACKING_DIR /
+    EYE_TRACKING_RESULTS_DIR /
     "metrics"
 )
 

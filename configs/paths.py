@@ -92,24 +92,14 @@ ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR = (
 # Results
 # ==========================================================
 
+EYE_TRACKING_RESULTS_DIR = (
+    RESULTS_DIR /
+    "eye_tracking"
+)
+
 QUALITY_DIR = (
     RESULTS_DIR /
-    "quality"
-)
-
-FEATURES_DIR = (
-    RESULTS_DIR /
-    "features"
-)
-
-FIGURES_DIR = (
-    RESULTS_DIR /
-    "figures"
-)
-
-TABLES_DIR = (
-    RESULTS_DIR /
-    "tables"
+    'quality'
 )
 
 

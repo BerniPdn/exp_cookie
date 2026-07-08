@@ -16,16 +16,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from configs.paths import (
+    ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR,
+    EYE_TRACKING_RESULTS_DIR
+)
+
 # ==========================================================
 # Paths
 # ==========================================================
 
 INPUT = Path(
-    "data/analysis/eye_tracking/metrics/eye_tracking_metrics.csv"
+    EYE_TRACKING_RESULTS_DIR /
+    "metrics"/
+   "eye_tracking_metrics.csv"
 )
 
-OUTPUT = Path(
-    "data/analysis/eye_tracking/figures"
+OUTPUT = (
+    EYE_TRACKING_RESULTS_DIR /
+    "descriptive_plots"
 )
 
 OUTPUT.mkdir(

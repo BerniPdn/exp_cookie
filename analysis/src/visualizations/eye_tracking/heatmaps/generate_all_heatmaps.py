@@ -6,7 +6,7 @@ from pathlib import Path
 
 from configs.paths import (
     ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR,
-    ANALYSIS_EYE_TRACKING_DIR,
+    EYE_TRACKING_RESULTS_DIR,
 )
 
 from .generate_heatmap import plot_heatmap
@@ -23,7 +23,7 @@ INPUT_DIR = (
 )
 
 OUTPUT_DIR = (
-    ANALYSIS_EYE_TRACKING_DIR /
+    EYE_TRACKING_RESULTS_DIR/
     "heatmaps" /
     "individual"
 )
