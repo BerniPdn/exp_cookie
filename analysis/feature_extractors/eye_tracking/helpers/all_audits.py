@@ -5,7 +5,7 @@ Generate audit plots for all eye-tracking CSV files.
 from pathlib import Path
 
 from configs.paths import (
-    ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR,
+    PROCESSED_EYE_TRACKING_DIR,
 )
 
 from .audit import audit
@@ -14,8 +14,7 @@ from .audit import audit
 def main():
 
     input_dir = (
-        ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR /
-        "with_aois"
+       PROCESSED_EYE_TRACKING_DIR
     )
 
     csv_files = sorted(

@@ -3,7 +3,7 @@ Project paths.
 
 This module centralizes every directory and file path used
 throughout the processing and analysis pipeline.
-"""
+""" 
 
 from pathlib import Path
 
@@ -66,6 +66,10 @@ TIMESTAMP_TRANSCRIPT_DIR = (
     PROCESSED_TRANSCRIPT_DIR / "timestamps"
 )
 
+MANUAL_TRANSCRIPT_DIR = (
+    PROCESSED_TRANSCRIPT_DIR / "corregidas_manualmente"
+)
+
 PROCESSED_EYE_TRACKING_DIR = (
     PROCESSED_DIR /
     "eye_tracking"
@@ -100,6 +104,11 @@ EYE_TRACKING_RESULTS_DIR = (
 QUALITY_DIR = (
     RESULTS_DIR /
     'quality'
+)
+
+TEXT_RESULTS_DIR = (
+     RESULTS_DIR /
+    "text"
 )
 
 
