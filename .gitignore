@@ -52,6 +52,9 @@ env/
 data/raw/**
 data/processed/**
 data/results/**
+data/analysis/**
+data/metadata/**
+data/features/**
 
 # ==========================================================
 # Keep directory structure

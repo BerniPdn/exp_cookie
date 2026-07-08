@@ -71,6 +71,22 @@ PROCESSED_EYE_TRACKING_DIR = (
     "eye_tracking"
 )
 
+# ==========================================================
+# Analysis data
+# ==========================================================
+
+
+ANALYSIS_DIR = DATA_DIR / "analysis"
+
+ANALYSIS_EYE_TRACKING_DIR = (
+    ANALYSIS_DIR /
+    "eye_tracking"
+)
+
+ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR = (
+    ANALYSIS_EYE_TRACKING_DIR /
+    "intermediate"
+)
 
 # ==========================================================
 # Results
@@ -109,6 +125,16 @@ VIDEO_QUALITY_REPORT = (
 EYE_TRACKING_QUALITY_REPORT = (
     QUALITY_DIR /
     "eye_tracking_quality.csv"
+)
+
+# ==========================================================
+# Metadata
+# ==========================================================
+METADATA_DIR = DATA_DIR / "metadata"
+
+SUBJECT_MAPPING = (
+    METADATA_DIR /
+    "subject_to_run.json"
 )
 
 # ==========================================================
