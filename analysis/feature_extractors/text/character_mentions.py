@@ -4,7 +4,7 @@ import spacy
 
 from configs.paths import (
     MANUAL_TRANSCRIPT_DIR,
-    TEXT_RESULTS_DIR,
+    TEXT_RESULTS_METRICS_DIR,
 )
 
 # ============================================================
@@ -13,7 +13,7 @@ from configs.paths import (
 
 TRANSCRIPT_DIR = MANUAL_TRANSCRIPT_DIR
 
-OUTPUT_FILE = TEXT_RESULTS_DIR / "character_mentions.csv"
+OUTPUT_FILE = TEXT_RESULTS_METRICS_DIR / "character_mentions.csv"
 
 OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 

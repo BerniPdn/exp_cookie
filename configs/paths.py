@@ -92,6 +92,21 @@ ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR = (
     "intermediate"
 )
 
+ANALYSIS_EYE_TRACKING_INTERMEDIATE_UNIMIRROR_DIR = (
+    ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR /
+    "unmirror"
+)
+
+ANALYSIS_EYE_TRACKING_INTERMEDIATE_AOIS_DIR = (
+    ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR /
+    "with_aois"
+)
+
+ANALYSIS_EYE_TRACKING_INTERMEDIATE_FILTERED_DIR = (
+    ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR /
+    "filtered"
+)
+
 # ==========================================================
 # Results
 # ==========================================================
@@ -111,6 +126,16 @@ TEXT_RESULTS_DIR = (
     "text"
 )
 
+TEXT_RESULTS_METRICS_DIR = (
+    TEXT_RESULTS_DIR /
+    "metrics"
+)
+
+TEXT_RESULTS_VIZ_DIR = (
+    TEXT_RESULTS_DIR /
+    "viz"
+)
+
 
 # ==========================================================
 # Quality reports
@@ -126,6 +151,11 @@ EYE_TRACKING_QUALITY_REPORT = (
     "eye_tracking_quality.csv"
 )
 
+FILTER_QUALITY_REPORT = (
+    QUALITY_DIR / 
+    "eye_tracking_filter-csv"
+)
+
 # ==========================================================
 # Metadata
 # ==========================================================
@@ -133,7 +163,7 @@ METADATA_DIR = DATA_DIR / "metadata"
 
 SUBJECT_MAPPING = (
     METADATA_DIR /
-    "subject_to_run.json"
+    "subject_mapping.json"
 )
 
 # ==========================================================

@@ -6,7 +6,7 @@ import spacy
 from wordcloud import WordCloud
 from configs.paths import (
     MANUAL_TRANSCRIPT_DIR,
-    TEXT_RESULTS_DIR,
+    TEXT_RESULTS_VIZ_DIR,
 )
 
 # ============================================================
@@ -14,7 +14,7 @@ from configs.paths import (
 # ============================================================
 
 TRANSCRIPT_DIR = MANUAL_TRANSCRIPT_DIR
-OUTPUT_DIR = TEXT_RESULTS_DIR
+OUTPUT_DIR = TEXT_RESULTS_VIZ_DIR
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 

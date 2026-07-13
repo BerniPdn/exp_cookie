@@ -80,17 +80,12 @@ def collapse_sequence(sequence):
     """
 
     collapsed = []
-
     previous = None
 
     for value in sequence:
-
         if value != previous:
-
             collapsed.append(value)
-
             previous = value
-
     return collapsed
 
 
@@ -100,48 +95,32 @@ def first_time(df, aoi):
     """
 
     subset = df[df["aoi"] == aoi]
-
     if len(subset):
-
         return subset["time_ms"].iloc[0]
-
     return None
-
 
 # ==========================================================
 # Metrics
 # ==========================================================
 
 def compute_metrics(csv_file: Path):
-
     df = pd.read_csv(csv_file)
-
     valid = df[df["inside_aoi"]].copy()
-
     run_id = df["run_id"].iloc[0]
-
     image = df["image"].iloc[0]
-
     condition = df["condition"].iloc[0]
 
     if image == "original":
-
         aois = OLD_AOIS
 
     else:
-
         aois = NEW_AOIS
 
     metrics = {
-
         "run_id": run_id,
-
         "image": image,
-
         "condition": condition,
-
         "n_samples": len(df),
-
         "pct_inside_image": (
             (
                 df["x_relative"].between(0, 1)
@@ -155,7 +134,6 @@ def compute_metrics(csv_file: Path):
         "pct_inside_aoi": (
             df["inside_aoi"].mean()
         ),
-
     }
 
     counts = (
@@ -213,12 +191,10 @@ def compute_metrics(csv_file: Path):
             )
 
         else:
-
             metrics[f"n_{aoi}"] = 0
-
             metrics[f"pct_{aoi}"] = 0.0
-
             metrics[f"pct_total_{aoi}"] = 0.0
+        
         #
         # First AOI
         #
@@ -394,13 +370,9 @@ def process_metrics(
     return {
 
         "processed": len(metrics),
-
         "skipped": False,
-
         "files": len(csv_files),
-
         "output": OUTPUT_FILE,
-
     }
 
 
@@ -416,45 +388,33 @@ def print_summary(
     """
 
     print("\n" + "=" * 60)
-
     print(
         "EYE TRACKING METRICS"
     )
-
     print("=" * 60)
 
     if summary["skipped"]:
-
         print()
-
         print(
             "Output already exists."
         )
-
         print(
             "Use --overwrite to regenerate it."
         )
 
     else:
-
         print()
-
         print(
             f"Files processed : {summary['files']}"
         )
-
         print(
             f"Rows written    : {summary['processed']}"
         )
 
     print()
-
     print("Saved to:")
-
     print(summary["output"])
-
     print()
-
     print("=" * 60)
 
 
@@ -465,35 +425,24 @@ def print_summary(
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
-
         description=(
             "Compute eye-tracking metrics."
         )
-
     )
 
     parser.add_argument(
-
         "--overwrite",
-
         action="store_true",
-
         help=(
             "Overwrite existing output."
         ),
-
     )
 
     args = parser.parse_args()
-
     summary = process_metrics(
-
         overwrite=args.overwrite,
-
     )
 
     print_summary(
-
         summary,
-
     )

@@ -59,7 +59,7 @@ def process_eye_tracking(
         encoding="utf-8",
     ) as file:
 
-        subject_to_run = json.load(file)
+        subject_mapping = json.load(file)
 
     summary = {
         "runs": len(runs),
@@ -77,12 +77,13 @@ def process_eye_tracking(
 
         subject_id = run["subject"]
 
-        if subject_id not in subject_to_run:
+        if subject_id not in subject_mapping:
             raise KeyError(
                 f"Subject {subject_id} not found in subject mapping."
             )
 
-        run_id = subject_to_run[subject_id]
+        participant = subject_mapping[subject_id]
+        run_id = participant["run_id"]
 
         print(
             f"[{run_index}/{len(runs)}] "

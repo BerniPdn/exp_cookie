@@ -1,14 +1,14 @@
 from pathlib import Path
 import pandas as pd
 
-from configs.paths import TEXT_RESULTS_DIR
+from configs.paths import TEXT_RESULTS_METRICS_DIR
 
 # ============================================================
 # CONFIG
 # ============================================================
 
-INPUT_FILE = TEXT_RESULTS_DIR / "character_mentions.csv"
-OUTPUT_FILE = TEXT_RESULTS_DIR / "character_summary.csv"
+INPUT_FILE = TEXT_RESULTS_METRICS_DIR / "character_mentions.csv"
+OUTPUT_FILE = TEXT_RESULTS_METRICS_DIR / "character_summary.csv"
 
 # ============================================================
 # LOAD

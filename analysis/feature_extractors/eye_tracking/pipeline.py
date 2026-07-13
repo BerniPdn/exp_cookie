@@ -6,23 +6,23 @@ from __future__ import annotations
 
 import argparse
 
-from analysis.src.feature_extractors.eye_tracking.quality_control import (
+from analysis.feature_extractors.eye_tracking.quality_control import (
     process_dataset as process_quality_control,
 )
 
-from analysis.src.feature_extractors.eye_tracking.filter_invalid_samples import (
+from analysis.feature_extractors.eye_tracking.filter_invalid_samples import (
     process_dataset as process_filter_invalid_samples,
 )
 
-from analysis.src.feature_extractors.eye_tracking.unmirror import (
+from analysis.feature_extractors.eye_tracking.unmirror import (
     process_unmirror,
 )
 
-from analysis.src.feature_extractors.eye_tracking.assign_aois import (
+from analysis.feature_extractors.eye_tracking.assign_aois import (
     process_dataset as process_assign_aois,
 )
 
-from analysis.src.feature_extractors.eye_tracking.metrics import (
+from analysis.feature_extractors.eye_tracking.metrics import (
     process_metrics,
 )
 

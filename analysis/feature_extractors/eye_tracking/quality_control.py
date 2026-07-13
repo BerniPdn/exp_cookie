@@ -16,7 +16,7 @@ import pandas as pd
 
 from configs.paths import (
     PROCESSED_EYE_TRACKING_DIR,
-    ANALYSIS_EYE_TRACKING_DIR,
+    EYE_TRACKING_QUALITY_REPORT,
 )
 
 # ==========================================================
@@ -25,10 +25,7 @@ from configs.paths import (
 
 INPUT_DIR = PROCESSED_EYE_TRACKING_DIR
 
-OUTPUT_DIR = (
-    ANALYSIS_EYE_TRACKING_DIR /
-    "quality"
-)
+OUTPUT_DIR = EYE_TRACKING_QUALITY_REPORT
 
 OUTPUT_FILE = (
     OUTPUT_DIR /
@@ -75,13 +72,9 @@ def inside_margin(df):
 def summarize(csv_file):
 
     df = pd.read_csv(csv_file)
-
     inside = inside_image(df)
-
     margin = inside_margin(df)
-
     participant = df["run_id"].iloc[0]
-
     image = df["image"].iloc[0]
 
     inside_pct = round(
@@ -107,25 +100,16 @@ def summarize(csv_file):
         quality = "Poor"
 
     return {
-
         "participant": participant,
-
         "file": csv_file.name,
-
         "image": image,
-
         "samples": len(df),
-
         "inside_image": int(inside.sum()),
-
         "inside_margin": int(margin.sum()),
-
         "pct_inside_image": inside_pct,
-
         "pct_inside_margin": margin_pct,
-
         "quality": quality,
-
+        
         "x_min":
             round(
                 df["x_relative"].min(),
@@ -173,19 +157,13 @@ def process_dataset(
     rows = []
 
     csv_files = sorted(
-
         f
-
         for f in INPUT_DIR.glob("*.csv")
-
         if "oasis" not in f.name.lower()
-
     )
 
     for csv_file in csv_files:
-
         print(f"Processing {csv_file.name}")
-
         rows.append(
             summarize(csv_file)
         )

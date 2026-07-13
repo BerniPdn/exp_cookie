@@ -17,7 +17,8 @@ import argparse
 import pandas as pd
 
 from configs.paths import (
-    ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR,
+    ANALYSIS_EYE_TRACKING_INTERMEDIATE_UNIMIRROR_DIR,
+    ANALYSIS_EYE_TRACKING_INTERMEDIATE_FILTERED_DIR
 )
 
 # ==========================================================
@@ -143,7 +144,7 @@ def process_unmirror(
         Processing summary.
     """
 
-    output_dir = ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR
+    output_dir = ANALYSIS_EYE_TRACKING_INTERMEDIATE_UNIMIRROR_DIR
 
     output_dir.mkdir(
         parents=True,
@@ -151,8 +152,7 @@ def process_unmirror(
     )
 
     input_dir = (
-        ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR /
-        "filtered"
+       ANALYSIS_EYE_TRACKING_INTERMEDIATE_FILTERED_DIR
     )
 
     input_files = sorted(

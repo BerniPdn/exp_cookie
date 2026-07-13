@@ -22,8 +22,8 @@ import pandas as pd
 
 from configs.paths import (
     PROCESSED_EYE_TRACKING_DIR,
-    ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR,
-    ANALYSIS_EYE_TRACKING_DIR,
+    ANALYSIS_EYE_TRACKING_INTERMEDIATE_FILTERED_DIR,
+    FILTER_QUALITY_REPORT
 )
 
 # ==========================================================
@@ -33,14 +33,10 @@ from configs.paths import (
 INPUT_DIR = PROCESSED_EYE_TRACKING_DIR
 
 OUTPUT_DIR = (
-    ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR /
-    "filtered"
+   ANALYSIS_EYE_TRACKING_INTERMEDIATE_FILTERED_DIR
 )
 
-SUMMARY_FILE = (
-    ANALYSIS_EYE_TRACKING_DIR /
-    "filter_summary.csv"
-)
+SUMMARY_FILE = FILTER_QUALITY_REPORT
 
 # ==========================================================
 # Filtering thresholds
