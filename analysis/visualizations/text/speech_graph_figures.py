@@ -13,10 +13,12 @@ def plot_metric(
 
     plot_df = df.copy()
 
-    # IDs cortos (P1, P2, ...)
-    subjects = sorted(plot_df["subject_id"].unique())
-    subject_map = {s: f"P{i+1}" for i, s in enumerate(subjects)}
-    plot_df["participant"] = plot_df["subject_id"].map(subject_map)
+    # Usar los primeros 8 caracteres del run_id como identificador
+    plot_df["participant"] = (
+        plot_df["run_id"]
+        .astype(str)
+        .str[:8]
+    )
 
     # Ordenar participantes por promedio de Word Count
     participant_order = (
@@ -44,7 +46,7 @@ def plot_metric(
         y_old = participant_data.loc["lamina_vieja", metric]
         y_new = participant_data.loc["lamina_nueva", metric]
 
-        # Línea entre condiciones
+        # Línea que une ambas condiciones
         ax.plot(
             [i - 0.08, i + 0.08],
             [y_old, y_new],
@@ -78,9 +80,13 @@ def plot_metric(
         )
 
     ax.set_xticks(range(len(participant_order)))
-    ax.set_xticklabels(participant_order)
+    ax.set_xticklabels(
+        participant_order,
+        rotation=45,
+        ha="right",
+    )
 
-    ax.set_xlabel("Participant")
+    ax.set_xlabel("Participant (Run ID)")
     ax.set_ylabel(ylabel if ylabel else metric)
 
     if title:
@@ -97,46 +103,3 @@ def plot_metric(
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
 
     plt.show()
-
-
-# ============================================================
-# CARGAR DATOS
-# ============================================================
-
-df = pd.read_csv("speech_graph_metrics.csv")
-
-# ============================================================
-# ELEGÍ LA MÉTRICA QUE QUERÉS GRAFICAR
-# ============================================================
-
-plot_metric(
-    df,
-    metric="word_count",
-    ylabel="Word Count",
-    title="Word Count",
-    save_path="word_count.png",
-)
-
-# Para las otras métricas simplemente cambiá estas líneas por:
-#
-# metric="naive_number_of_nodes"
-# ylabel="Number of Nodes"
-# title="Number of Nodes"
-#
-# o
-#
-# metric="naive_degree_average"
-# ylabel="Average Degree"
-# title="Average Degree"
-#
-# o
-#
-# metric="naive_LSC"
-# ylabel="Largest Strongly Connected Component"
-# title="Largest Strongly Connected Component"
-#
-# o
-#
-# metric="naive_PE"
-# ylabel="PE"
-# title="PE"
