@@ -19,20 +19,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from configs.paths import (
-    TEXT_RESULTS_METRICS_DIR,
-    TEXT_RESULTS_VIZ_DIR,
+    CHARACTER_MENTIONS_FILE,
+    CHARACTER_MENTIONS_FIGURES_DIR,
 )
 
 # ---------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------
 
-INPUT_FILE = TEXT_RESULTS_METRICS_DIR / "character_mentions.csv"
-
-OUTPUT_DIR = (
-    TEXT_RESULTS_VIZ_DIR
-    / "character_mentions"
-)
+INPUT_FILE = CHARACTER_MENTIONS_FILE
+OUTPUT_DIR = CHARACTER_MENTIONS_FIGURES_DIR
 
 OUTPUT_DIR.mkdir(
     parents=True,
@@ -483,4 +479,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

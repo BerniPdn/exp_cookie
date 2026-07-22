@@ -15,12 +15,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from configs.paths import (
-    TEXT_RESULTS_METRICS_DIR,
-    TEXT_RESULTS_VIZ_DIR,
+    SPEECH_GRAPH_METRICS_FILE,
+    SPEECH_GRAPH_FIGURES_DIR,
 )
 
-INPUT_FILE = TEXT_RESULTS_METRICS_DIR / "speech_graph_metrics.csv"
-OUTPUT_DIR = TEXT_RESULTS_VIZ_DIR / "speech_graph"
+INPUT_FILE = SPEECH_GRAPH_METRICS_FILE
+OUTPUT_DIR = SPEECH_GRAPH_FIGURES_DIR
 
 
 def plot_metric(df, metric, ylabel=None, title=None, save_path=None):

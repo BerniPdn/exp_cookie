@@ -18,7 +18,7 @@ import pandas as pd
 from configs.paths import (
     CLEAN_TRANSCRIPT_DIR,
     SUBJECT_MAPPING,
-    TEXT_RESULTS_METRICS_DIR,
+    SPEECH_GRAPH_METRICS_FILE,
 )
 
 from .speech_graphs import SpeechGraph
@@ -28,10 +28,7 @@ from .speech_graphs import SpeechGraph
 # Paths
 # ==========================================================
 
-OUTPUT_FILE = (
-    TEXT_RESULTS_METRICS_DIR /
-    "speech_graph_metrics.csv"
-)
+OUTPUT_FILE = SPEECH_GRAPH_METRICS_FILE
 
 
 # ==========================================================

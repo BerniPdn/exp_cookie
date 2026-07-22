@@ -10,31 +10,21 @@ How does changing the caregiver's gender affect
 visual attention?
 """
 
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from configs.paths import (
-    ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR,
-    EYE_TRACKING_RESULTS_DIR
+    EYE_TRACKING_METRICS_FILE,
+    EYE_TRACKING_DESCRIPTIVE_PLOTS_DIR,
 )
 
 # ==========================================================
 # Paths
 # ==========================================================
 
-INPUT = Path(
-    EYE_TRACKING_RESULTS_DIR /
-    "metrics"/
-   "eye_tracking_metrics.csv"
-)
-
-OUTPUT = (
-    EYE_TRACKING_RESULTS_DIR /
-    "descriptive_plots"
-)
+INPUT = EYE_TRACKING_METRICS_FILE
+OUTPUT = EYE_TRACKING_DESCRIPTIVE_PLOTS_DIR
 
 OUTPUT.mkdir(
     parents=True,

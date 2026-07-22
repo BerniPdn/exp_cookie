@@ -21,7 +21,7 @@ import spacy
 from configs.paths import (
     CLEAN_TRANSCRIPT_DIR,
     SUBJECT_MAPPING,
-    TEXT_RESULTS_METRICS_DIR,
+    CHARACTER_MENTIONS_FILE,
 )
 
 
@@ -29,10 +29,7 @@ from configs.paths import (
 # Paths
 # ==========================================================
 
-OUTPUT_FILE = (
-    TEXT_RESULTS_METRICS_DIR /
-    "character_mentions.csv"
-)
+OUTPUT_FILE = CHARACTER_MENTIONS_FILE
 
 # ==========================================================
 # spaCy
