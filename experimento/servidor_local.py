@@ -5,16 +5,12 @@ Emula los endpoints de datapruebas.org para recibir audios/videos y datos de jsP
 Hecho con Gemini - Modificado para soportar la nueva API de record_video en el puerto 8002.
 """
 
-import os
-from pathlib import Path
 from flask import Flask, request, jsonify
+from configs.paths import LOCAL_RECORDINGS_DIR
 
 PORT = 8002
 
-CARPETA_GRABACIONES = (
-    Path(__file__).parent /
-    "local_recordings"
-)
+CARPETA_GRABACIONES = LOCAL_RECORDINGS_DIR
 
 CARPETA_GRABACIONES.mkdir(
     parents=True,

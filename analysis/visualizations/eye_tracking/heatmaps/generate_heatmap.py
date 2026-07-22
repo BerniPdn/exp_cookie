@@ -23,6 +23,8 @@ from scipy.ndimage import gaussian_filter
 
 from configs.paths import (
     ANALYSIS_EYE_TRACKING_DIR,
+    COOKIE_NEW_IMAGE,
+    COOKIE_OLD_IMAGE,
 )
 
 # ==========================================================
@@ -36,15 +38,8 @@ OUTPUT_DIR = (
 
 IMAGE_FILES = {
 
-    "new":
-        Path(
-            "experimento/cookie_nueva_original.png"
-        ),
-
-    "original":
-        Path(
-            "experimento/cookie_vieja_original.png"
-        ),
+    "new": COOKIE_NEW_IMAGE,
+    "original": COOKIE_OLD_IMAGE,
 
 }
 
