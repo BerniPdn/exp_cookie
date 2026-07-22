@@ -18,6 +18,8 @@ import pandas as pd
 from configs.paths import (
     EYE_TRACKING_RESULTS_DIR,
     ANALYSIS_EYE_TRACKING_INTERMEDIATE_DIR,
+    EYE_TRACKING_METRICS_DIR,
+    EYE_TRACKING_METRICS_FILE,
 )
 
 # ==========================================================
@@ -29,15 +31,8 @@ INPUT_DIR = (
     "with_aois"
 )
 
-OUTPUT_DIR = (
-    EYE_TRACKING_RESULTS_DIR /
-    "metrics"
-)
-
-OUTPUT_FILE = (
-    OUTPUT_DIR /
-    "eye_tracking_metrics.csv"
-)
+OUTPUT_DIR = EYE_TRACKING_METRICS_DIR
+OUTPUT_FILE = EYE_TRACKING_METRICS_FILE
 
 # ==========================================================
 # AOIs

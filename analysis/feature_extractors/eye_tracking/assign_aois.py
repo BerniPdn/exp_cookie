@@ -21,6 +21,8 @@ from configs.paths import (
     ANALYSIS_EYE_TRACKING_INTERMEDIATE_UNIMIRROR_DIR,
     METADATA_DIR,
     ANALYSIS_EYE_TRACKING_INTERMEDIATE_AOIS_DIR,
+    NEW_AOIS_FILE,
+    OLD_AOIS_FILE,
 )
 
 # ==========================================================
@@ -35,15 +37,8 @@ OUTPUT_DIR = (
     ANALYSIS_EYE_TRACKING_INTERMEDIATE_AOIS_DIR
 )
 
-NEW_AOIS = (
-    METADATA_DIR /
-    "aois_lamina_nueva.csv"
-)
-
-OLD_AOIS = (
-    METADATA_DIR /
-    "aois_lamina_vieja.csv"
-)
+NEW_AOIS = NEW_AOIS_FILE
+OLD_AOIS = OLD_AOIS_FILE
 
 # ==========================================================
 # Load AOIs

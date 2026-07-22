@@ -25,12 +25,7 @@ from configs.paths import (
 
 INPUT_DIR = PROCESSED_EYE_TRACKING_DIR
 
-OUTPUT_DIR = EYE_TRACKING_QUALITY_REPORT
-
-OUTPUT_FILE = (
-    OUTPUT_DIR /
-    "eye_tracking_quality.csv"
-)
+OUTPUT_FILE = EYE_TRACKING_QUALITY_REPORT
 
 MARGIN = 0.20
 
@@ -144,7 +139,7 @@ def process_dataset(
     overwrite=False,
 ):
 
-    OUTPUT_DIR.mkdir(
+    OUTPUT_FILE.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
