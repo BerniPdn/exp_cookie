@@ -1,6 +1,21 @@
+# Core data processing
 numpy
 pandas
+
+# Video and audio processing
 opencv-python
 faster-whisper
 torch
+
+# Experiment local server
 Flask
+
+# Text analysis
+spacy
+nltk
+networkx
+wordcloud
+
+# Analysis and visualizations
+matplotlib
+scipy
