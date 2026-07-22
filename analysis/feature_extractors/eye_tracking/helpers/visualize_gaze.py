@@ -24,40 +24,30 @@ import pandas as pd
 from configs.paths import (
     METADATA_DIR,
     ANALYSIS_EYE_TRACKING_DIR,
+    EYE_TRACKING_VISUALIZATIONS_DIR,
+    NEW_AOIS_FILE,
+    OLD_AOIS_FILE,
+    COOKIE_NEW_IMAGE,
+    COOKIE_OLD_IMAGE,
 )
 
 # ==========================================================
 # Paths
 # ==========================================================
 
-OUTPUT_DIR = (
-    ANALYSIS_EYE_TRACKING_DIR /
-    "visualizations"
-)
+OUTPUT_DIR = EYE_TRACKING_VISUALIZATIONS_DIR
 
 AOI_FILES = {
 
-    "new":
-        METADATA_DIR /
-        "aois_lamina_nueva.csv",
-
-    "original":
-        METADATA_DIR /
-        "aois_lamina_vieja.csv",
+    "new": NEW_AOIS_FILE,
+    "original": OLD_AOIS_FILE,
 
 }
 
 IMAGE_FILES = {
 
-    "new":
-        Path(
-            "experimento/cookie_nueva_original.png"
-        ),
-
-    "original":
-        Path(
-            "experimento/cookie_vieja_original.png"
-        ),
+    "new": COOKIE_NEW_IMAGE,
+    "original": COOKIE_OLD_IMAGE,
 
 }
 

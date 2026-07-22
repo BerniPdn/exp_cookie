@@ -12,13 +12,10 @@ import matplotlib.patches as patches
 import pandas as pd
 
 from configs.paths import (
-    EYE_TRACKING_RESULTS_DIR,
+    EYE_TRACKING_AUDIT_DIR,
 )
 
-OUTPUT_DIR = (
-    EYE_TRACKING_RESULTS_DIR /
-    "audit"
-)
+OUTPUT_DIR = EYE_TRACKING_AUDIT_DIR
 
 
 def audit(csv_file: Path):
