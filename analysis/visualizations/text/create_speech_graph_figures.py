@@ -23,7 +23,14 @@ INPUT_FILE = SPEECH_GRAPH_METRICS_FILE
 OUTPUT_DIR = SPEECH_GRAPH_FIGURES_DIR
 
 
-def plot_metric(df, metric, ylabel=None, title=None, save_path=None):
+def plot_metric(
+    df,
+    metric,
+    ylabel=None,
+    title=None,
+    save_path=None,
+    show=True,
+):
     if metric not in df.columns:
         raise ValueError(f"Unknown metric: {metric}")
 
@@ -116,7 +123,10 @@ def plot_metric(df, metric, ylabel=None, title=None, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
         print(f"Saved: {save_path}")
 
-    plt.show()
+    if show:
+        plt.show()
+    else:
+        plt.close(fig)
 
 
 def main():
