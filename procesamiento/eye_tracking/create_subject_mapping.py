@@ -17,16 +17,14 @@ import pandas as pd
 from configs.paths import (
     RAW_EYE_TRACKING_DIR,
     SUBJECT_MAPPING,
+    PARTICIPANT_INFORMATION_FILE,
 )
 
 # ==========================================================
 # Paths
 # ==========================================================
 
-INPUT_FILE = (
-    RAW_EYE_TRACKING_DIR /
-    "participant_information.csv"
-)
+INPUT_FILE = PARTICIPANT_INFORMATION_FILE
 
 OUTPUT_FILE = SUBJECT_MAPPING 
 

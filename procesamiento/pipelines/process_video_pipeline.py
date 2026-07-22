@@ -6,6 +6,7 @@ import argparse
 
 from procesamiento.video.process_videos import process_videos
 from procesamiento.video.quality_control import quality_control
+from configs.paths import VIDEO_QUALITY_REPORT
 
 
 def run_video_pipeline(
@@ -28,7 +29,15 @@ def run_video_pipeline(
         overwrite=overwrite,
     )
 
-    quality_control()
+    report = quality_control()
+    VIDEO_QUALITY_REPORT.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+    report.to_csv(
+        VIDEO_QUALITY_REPORT,
+        index=False,
+    )
 
     print("\n✓ Video pipeline completed.")
 

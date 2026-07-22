@@ -14,6 +14,13 @@ from pathlib import Path
 # exp_cookie/
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
+# Experiment assets and local development output
+EXPERIMENT_DIR = PROJECT_ROOT / "experimento"
+LOCAL_RECORDINGS_DIR = EXPERIMENT_DIR / "local_recordings"
+
+COOKIE_OLD_IMAGE = EXPERIMENT_DIR / "cookie_vieja_original.png"
+COOKIE_NEW_IMAGE = EXPERIMENT_DIR / "cookie_nueva_original.png"
+
 
 # ==========================================================
 # Data directories
@@ -165,6 +172,32 @@ SUBJECT_MAPPING = (
     METADATA_DIR /
     "subject_mapping.json"
 )
+
+PARTICIPANT_INFORMATION_FILE = (
+    RAW_EYE_TRACKING_DIR /
+    "participant_information.csv"
+)
+
+OLD_AOIS_FILE = METADATA_DIR / "aois_lamina_vieja.csv"
+NEW_AOIS_FILE = METADATA_DIR / "aois_lamina_nueva.csv"
+
+# ==========================================================
+# Analysis outputs
+# ==========================================================
+
+SPEECH_GRAPH_METRICS_FILE = TEXT_RESULTS_METRICS_DIR / "speech_graph_metrics.csv"
+CHARACTER_MENTIONS_FILE = TEXT_RESULTS_METRICS_DIR / "character_mentions.csv"
+SPEECH_GRAPH_FIGURES_DIR = TEXT_RESULTS_VIZ_DIR / "speech_graph"
+CHARACTER_MENTIONS_FIGURES_DIR = TEXT_RESULTS_VIZ_DIR / "character_mentions"
+
+EYE_TRACKING_METRICS_DIR = EYE_TRACKING_RESULTS_DIR / "metrics"
+EYE_TRACKING_METRICS_FILE = EYE_TRACKING_METRICS_DIR / "eye_tracking_metrics.csv"
+EYE_TRACKING_HEATMAPS_DIR = EYE_TRACKING_RESULTS_DIR / "heatmaps"
+INDIVIDUAL_HEATMAPS_DIR = EYE_TRACKING_HEATMAPS_DIR / "individual"
+AVERAGE_HEATMAPS_DIR = EYE_TRACKING_HEATMAPS_DIR / "average"
+EYE_TRACKING_DESCRIPTIVE_PLOTS_DIR = EYE_TRACKING_RESULTS_DIR / "descriptive_plots"
+EYE_TRACKING_AUDIT_DIR = EYE_TRACKING_RESULTS_DIR / "audit"
+EYE_TRACKING_VISUALIZATIONS_DIR = ANALYSIS_EYE_TRACKING_DIR / "visualizations"
 
 # ==========================================================
 # Helpers
